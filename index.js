@@ -327,10 +327,11 @@ app.get('/generate', async (req, res) => {
 
 // Export for use in API routes
 module.exports = {
-  generateICS
+  generateICS,
+  app // 导出 Express app
 };
 
-// Start server if running directly
+// Start server if running directly (not in Vercel)
 if (require.main === module) {
   const port = process.env.PORT || 3000;
   app.listen(port, () => {
@@ -338,3 +339,6 @@ if (require.main === module) {
     generateICS();
   });
 }
+
+// Export default handler for Vercel
+module.exports.default = app;

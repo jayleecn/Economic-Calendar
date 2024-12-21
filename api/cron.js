@@ -1,7 +1,11 @@
 const { generateICS } = require('../index.js');
 
-// Vercel Cron Job handler - runs daily at 12:00 Beijing time (04:00 UTC)
+// Vercel Serverless Function handler
 export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
     console.log('Daily update started at:', new Date().toISOString());
     await generateICS();
