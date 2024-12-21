@@ -325,27 +325,16 @@ app.get('/generate', async (req, res) => {
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  
-  // Generate initial ICS file
-  generateICS().catch(error => {
-    console.error('Failed to generate initial ICS files:', error);
+// Export for use in API routes
+module.exports = {
+  generateICS
+};
+
+// Start server if running directly
+if (require.main === module) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+    generateICS();
   });
-  
-  // Schedule daily updates at 00:00 Beijing time
-  setInterval(async () => {
-    try {
-      const now = new Date();
-      const beijingTime = formatToTimeZone(now, 'HH:mm', { timeZone: 'Asia/Shanghai' });
-      
-      if (beijingTime === '00:00') {
-        console.log('Running scheduled update...');
-        await generateICS();
-      }
-    } catch (error) {
-      console.error('Failed to run scheduled update:', error);
-    }
-  }, 60000); // Check every minute
-});
+}
