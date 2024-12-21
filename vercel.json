@@ -4,12 +4,20 @@
     {
       "src": "index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
+      "src": "/economic-calendar.*\\.ics",
+      "dest": "/public/economic-calendar$1.ics"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "/index.js"
     }
   ]
 }
