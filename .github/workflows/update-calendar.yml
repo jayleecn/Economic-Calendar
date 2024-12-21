@@ -2,18 +2,22 @@ name: Update Economic Calendar
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # 每5分钟运行一次
+    - cron: '*/10 * * * *'  # 每10分钟运行一次
   workflow_dispatch:  # 允许手动触发
+
+permissions:
+  contents: write  # 添加写入权限
 
 jobs:
   update-calendar:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 8  # 设置超时时间为8分钟
+
     steps:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+        
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -27,7 +31,7 @@ jobs:
         
       - name: Commit and push if changed
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add public/*.ics
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update calendar data [skip ci]" && git push)
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          git add public/economic-calendar*.ics
+          git diff --staged --quiet || (git commit -m "chore: update calendar [skip ci]" && git push)

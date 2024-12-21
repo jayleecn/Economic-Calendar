@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
-const { writeFileSync, mkdirSync, existsSync } = require('fs');
+const fs = require('fs');
+const fsp = require('fs').promises;
 const path = require('path');
 const { formatToTimeZone } = require('date-fns-tz');
 const { addDays, startOfDay, endOfDay } = require('date-fns');
@@ -195,7 +196,7 @@ const generateCountryICS = async (countryCode, events) => {
         const fileName = COUNTRY_NAMES[countryCode] || countryCode.toLowerCase();
         const filePath = path.join(publicDir, `economic-calendar-${fileName}.ics`);
         try {
-          writeFileSync(filePath, value);
+          fs.writeFileSync(filePath, value);
           console.log(`Successfully wrote calendar file for ${countryName} to ${filePath}`);
           resolve(value);
         } catch (error) {
@@ -208,7 +209,7 @@ const generateCountryICS = async (countryCode, events) => {
 };
 
 // Generate all ICS files
-const generateICS = async () => {
+async function generateICS() {
   try {
     // 先更新国家代码
     await updateCountryCodes();
@@ -286,7 +287,7 @@ const generateICS = async () => {
           console.error('Error creating combined ICS:', error);
           reject(error);
         } else {
-          writeFileSync(path.join(publicDir, 'economic-calendar.ics'), value);
+          fs.writeFileSync(path.join(publicDir, 'economic-calendar.ics'), value);
           console.log('Generated combined ICS file');
           resolve(value);
         }
@@ -300,6 +301,28 @@ const generateICS = async () => {
 
     await Promise.all(countryPromises);
     console.log('All ICS files generated successfully');
+
+    // Update index.html with generation time
+    const now = new Date();
+    const timeString = now.toLocaleString('zh-CN', { 
+      timeZone: 'Asia/Shanghai',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+    
+    const indexPath = path.join(__dirname, 'public', 'index.html');
+    let indexContent = await fsp.readFile(indexPath, 'utf8');
+    indexContent = indexContent.replace(
+      /日历生成时间：.*。<\/p>/,
+      `日历生成时间：${timeString}。`
+    );
+    await fsp.writeFile(indexPath, indexContent, 'utf8');
+    
+    console.log('Calendar generated successfully at:', timeString);
   } catch (error) {
     console.error('Error generating ICS files:', error);
     throw error;
@@ -308,8 +331,8 @@ const generateICS = async () => {
 
 // Ensure public directory exists
 const publicDir = path.join(__dirname, 'public');
-if (!existsSync(publicDir)) {
-  mkdirSync(publicDir, { recursive: true });
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
 }
 
 // Serve static files
