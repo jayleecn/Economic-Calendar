@@ -5,7 +5,7 @@ const fsp = require('fs').promises;
 const path = require('path');
 const { formatToTimeZone } = require('date-fns-tz');
 const { addDays, startOfDay, endOfDay } = require('date-fns');
-const ical = require('ical-generator');
+const ical = require('ical-generator').default;
 const countryFlagEmoji = require('country-flag-emoji');
 
 const app = express();
@@ -157,29 +157,31 @@ async function generateCalendarContent() {
     
     // Calculate time range (Beijing time)
     const now = new Date();
-    const start = Math.floor(startOfDay(now).getTime() / 1000); // 从今天开始
-    const end = Math.floor(endOfDay(addDays(now, 30)).getTime() / 1000); // 到30天后
+    const startTime = startOfDay(now);
+    const endTime = endOfDay(addDays(now, 7));
 
-    console.log(`Time range: ${new Date(start * 1000).toISOString()} to ${new Date(end * 1000).toISOString()}`);
+    console.log('Fetching events from', startTime, 'to', endTime);
 
-    // Fetch data from API
+    // Fetch events
     const response = await axios.get('https://api-one-wscn.awtmt.com/apiv1/finance/macrodatas', {
-      params: { start, end }
+      params: {
+        start: Math.floor(startTime.getTime() / 1000),
+        end: Math.floor(endTime.getTime() / 1000),
+      },
     });
 
-    if (!response.data?.data?.items || !Array.isArray(response.data.data.items)) {
-      console.error('Invalid API response format:', response.data);
-      throw new Error('Invalid API response format');
-    }
-
     const items = response.data.data.items;
-    console.log(`Received ${items.length} events from API`);
+    console.log(`Fetched ${items.length} events`);
 
-    // 只保留重要性为 3 的事件
+    // Filter important events
     const importantEvents = items.filter(event => event.importance === 3);
     console.log(`Filtered ${importantEvents.length} important events (importance = 3)`);
 
-    const calendar = ical({ name: 'Economic Calendar' });
+    // Create calendar
+    const calendar = ical({
+      name: 'Economic Calendar',
+      timezone: 'Asia/Shanghai'
+    });
 
     for (const event of importantEvents) {
       const startDate = toUTCDate(event.public_date);
