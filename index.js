@@ -101,9 +101,14 @@ const getCountryEmoji = (countryCode) => {
   return COUNTRY_EMOJIS[countryCode] || '';
 };
 
-// Convert timestamp to UTC Date object
+// Convert timestamp to UTC Date object (considering Beijing timezone)
 const toUTCDate = (timestamp) => {
-  return new Date(timestamp * 1000);
+  // 创建北京时间的 Date 对象
+  const date = new Date(timestamp * 1000);
+  // 转换为北京时间（UTC+8）
+  const beijingOffset = 8 * 60 * 60 * 1000; // 8小时的毫秒数
+  const utcDate = new Date(date.getTime() + beijingOffset);
+  return utcDate;
 };
 
 // Get country flag emoji
