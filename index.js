@@ -348,6 +348,21 @@ app.get('/generate', async (req, res) => {
   }
 });
 
+// API endpoint to generate ICS file
+app.get('/api/generate', async (req, res) => {
+  try {
+    await generateICS();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, message: 'Calendar generated successfully' }));
+    return;
+  } catch (error) {
+    console.error('Error generating calendar:', error);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: error.message }));
+    return;
+  }
+});
+
 // Start server if running directly (not in Vercel)
 if (require.main === module) {
   const port = process.env.PORT || 3000;
