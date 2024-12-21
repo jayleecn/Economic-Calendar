@@ -1,9 +1,9 @@
 const { generateICS } = require('../index.js');
 
-// Vercel Cron Job handler
+// Vercel Cron Job handler - runs daily at 12:00 Beijing time (04:00 UTC)
 export default async function handler(req, res) {
   try {
-    console.log('Cron job started at:', new Date().toISOString());
+    console.log('Daily update started at:', new Date().toISOString());
     await generateICS();
     console.log('Calendar updated successfully');
     res.status(200).json({ success: true, message: 'Calendar updated successfully' });
