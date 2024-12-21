@@ -103,6 +103,32 @@
         .copy-button.copied .copy-success {
             display: block;
         }
+        .country-list {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .country-card {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+        }
+        .country-link {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .country-link:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -110,8 +136,8 @@
         <h1>📅 中国宏观事件日历订阅服务</h1>
         
         <div class="subscription-box">
-            <p>点击下方链接订阅经济日历：</p>
-            <a href="/cal.ics" class="subscription-link">订阅日历</a>
+            <p>点击下方链接订阅完整经济日历：</p>
+            <a href="/cal.ics" class="subscription-link">订阅完整日历</a>
             <div class="url-box">
                 <input type="text" id="calendarUrl" readonly value="http://localhost:3000/cal.ics" class="url-input">
                 <button onclick="copyUrl()" class="copy-button">
@@ -120,6 +146,58 @@
                 </button>
             </div>
             <p>（包含过去7天和未来7天的经济事件，每天00:00自动更新）</p>
+        </div>
+
+        <h2 style="text-align: center; margin-top: 30px;">🌏 按国家订阅</h2>
+        <div class="country-list">
+            <div class="country-card">
+                <h3>🇦🇺 澳大利亚</h3>
+                <a href="/cal-australia.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇪🇺 欧元区</h3>
+                <a href="/cal-eurozone.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇨🇳 中国</h3>
+                <a href="/cal-china.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇫🇷 法国</h3>
+                <a href="/cal-france.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇨🇦 加拿大</h3>
+                <a href="/cal-canada.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇨🇭 瑞士</h3>
+                <a href="/cal-switzerland.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇩🇪 德国</h3>
+                <a href="/cal-germany.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇺🇸 美国</h3>
+                <a href="/cal-united-states.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇮🇹 意大利</h3>
+                <a href="/cal-italy.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇬🇧 英国</h3>
+                <a href="/cal-united-kingdom.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇯🇵 日本</h3>
+                <a href="/cal-japan.ics" class="country-link">订阅日历</a>
+            </div>
+            <div class="country-card">
+                <h3>🇳🇿 新西兰</h3>
+                <a href="/cal-new-zealand.ics" class="country-link">订阅日历</a>
+            </div>
         </div>
 
         <div class="instructions">
