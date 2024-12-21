@@ -15,21 +15,51 @@ jobs:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Download and save calendar
+      
+      - name: Setup directories
         run: |
-          # 下载日历内容并保存
+          mkdir -p public
+          
+      - name: Download global calendar
+        run: |
           curl -o public/economic-calendar.ics https://economic-calendar-lovat.vercel.app/api/generate
           
-          # 获取当前时间（北京时间）
-          current_time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M')
-          
-          # 更新 index.html 中的生成时间
-          sed -i "s/日历生成时间：.*。<\/p>/日历生成时间：$current_time。<\/p>/" public/index.html
-          
-      - name: Commit and push if changed
+      - name: Download country calendars
         run: |
-          git config --global user.name 'GitHub Actions Bot'
-          git config --global user.email 'actions@github.com'
-          git add public/economic-calendar.ics public/index.html
-          git diff --staged --quiet || (git commit -m "chore: update calendar [skip ci]" && git push)
+          # 下载各个国家的日历
+          curl -o "public/economic-calendar-united-states.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=US"
+          curl -o "public/economic-calendar-china.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=CN"
+          curl -o "public/economic-calendar-eurozone.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=EA"
+          curl -o "public/economic-calendar-japan.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=JP"
+          curl -o "public/economic-calendar-united-kingdom.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=UK"
+          curl -o "public/economic-calendar-australia.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=AU"
+          curl -o "public/economic-calendar-germany.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=DE"
+          curl -o "public/economic-calendar-france.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=FR"
+          curl -o "public/economic-calendar-canada.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=CA"
+          curl -o "public/economic-calendar-switzerland.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=CH"
+          curl -o "public/economic-calendar-italy.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=IT"
+          curl -o "public/economic-calendar-new-zealand.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=NZ"
+          curl -o "public/economic-calendar-spain.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=ES"
+          curl -o "public/economic-calendar-south-korea.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=KR"
+          curl -o "public/economic-calendar-hong-kong.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=HK"
+          curl -o "public/economic-calendar-singapore.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=SG"
+          curl -o "public/economic-calendar-norway.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=NO"
+          curl -o "public/economic-calendar-sweden.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=SE"
+          
+      - name: Update generation time
+        run: |
+          timestamp=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          sed -i "s/最后更新时间：.*/最后更新时间：$timestamp/g" public/index.html
+          
+      - name: List files
+        run: |
+          ls -la public/
+          
+      - name: Commit and push if there are changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add public/*.ics
+          git add public/index.html
+          git commit -m "chore: update calendar files" || exit 0
+          git push
