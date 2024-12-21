@@ -1,4 +1,16 @@
+# Node.js
 node_modules/
+
+# Generated files
+public/*.ics
+
+# Environment variables
 .env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
 .DS_Store
-public/cal.ics
+Thumbs.db
