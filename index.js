@@ -143,7 +143,7 @@ const formatDescription = (actual, forecast, previous) => {
 // Format location with country and values
 const formatLocation = (emoji, country, actual, forecast, previous) => {
   const values = formatDescription(actual, forecast, previous);
-  return `${emoji} ${country} | ${values}`;
+  return values ? `${emoji} ${country} | ${values}` : `${emoji} ${country}`;
 };
 
 // Generate ICS events for a specific country
