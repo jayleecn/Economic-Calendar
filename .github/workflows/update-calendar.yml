@@ -46,14 +46,14 @@ jobs:
           curl -o "public/economic-calendar-norway.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=NO"
           curl -o "public/economic-calendar-sweden.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=SE"
           
+      - name: List files
+        run: |
+          ls -la public/
+          
       - name: Update generation time
         run: |
           timestamp=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
           sed -i "s/最后更新时间：.*/最后更新时间：$timestamp/g" public/index.html
-          
-      - name: List files
-        run: |
-          ls -la public/
           
       - name: Commit and push if there are changes
         run: |
