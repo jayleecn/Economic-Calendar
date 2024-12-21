@@ -5,7 +5,7 @@ const fsp = require('fs').promises;
 const path = require('path');
 const { formatToTimeZone } = require('date-fns-tz');
 const { addDays, startOfDay, endOfDay } = require('date-fns');
-const { createEvents } = require('ics');
+const ical = require('ical-generator');
 const countryFlagEmoji = require('country-flag-emoji');
 
 const app = express();
@@ -147,74 +147,13 @@ const formatLocation = (emoji, country, actual, forecast, previous) => {
   return values ? `${emoji} ${country} | ${values}` : `${emoji} ${country}`;
 };
 
-// Generate ICS events for a specific country
-const generateCountryICS = async (countryCode, events) => {
-  const countryName = COUNTRY_CODES[countryCode][0];
-  console.log(`Generating calendar for ${countryName} with ${events.length} events`);
-  
-  // 只保留重要性为 3 的事件
-  const importantEvents = events.filter(event => event.importance === 3);
-  
-  if (importantEvents.length === 0) {
-    console.log(`No important events found for ${countryName}`);
-    return;
-  }
-
-  const calendarEvents = importantEvents.map(event => {
-    const startDate = toUTCDate(event.public_date);
-    const normalizedCountry = getNormalizedCountry(event.country);
-    const emoji = getCountryEmoji(normalizedCountry);
-
-    return {
-      uid: event.calendar_key,
-      start: [
-        startDate.getUTCFullYear(),
-        startDate.getUTCMonth() + 1,
-        startDate.getUTCDate(),
-        startDate.getUTCHours(),
-        startDate.getUTCMinutes()
-      ],
-      end: [
-        startDate.getUTCFullYear(),
-        startDate.getUTCMonth() + 1,
-        startDate.getUTCDate(),
-        startDate.getUTCHours(),
-        startDate.getUTCMinutes()
-      ],
-      title: `${event.title}`,
-      description: '',
-      location: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous)
-    };
-  });
-
-  return new Promise((resolve, reject) => {
-    createEvents(calendarEvents, (error, value) => {
-      if (error) {
-        console.error(`Error creating ICS for ${countryName}:`, error);
-        reject(error);
-      } else {
-        const fileName = COUNTRY_NAMES[countryCode] || countryCode.toLowerCase();
-        const filePath = path.join(publicDir, `economic-calendar-${fileName}.ics`);
-        try {
-          fs.writeFileSync(filePath, value);
-          console.log(`Successfully wrote calendar file for ${countryName} to ${filePath}`);
-          resolve(value);
-        } catch (error) {
-          console.error(`Error writing file for ${countryName}:`, error);
-          reject(error);
-        }
-      }
-    });
-  });
-};
-
-// Generate all ICS files
-async function generateICS() {
+// 生成日历内容
+async function generateCalendarContent() {
   try {
     // 先更新国家代码
     await updateCountryCodes();
     
-    console.log('Generating ICS files...');
+    console.log('Generating calendar content...');
     
     // Calculate time range (Beijing time)
     const now = new Date();
@@ -240,94 +179,52 @@ async function generateICS() {
     const importantEvents = items.filter(event => event.importance === 3);
     console.log(`Filtered ${importantEvents.length} important events (importance = 3)`);
 
-    // Group events by normalized country
-    const eventsByCountry = {};
-    importantEvents.forEach(event => {
-      const normalizedCountry = getNormalizedCountry(event.country);
-      if (normalizedCountry) {
-        if (!eventsByCountry[normalizedCountry]) {
-          eventsByCountry[normalizedCountry] = [];
-        }
-        eventsByCountry[normalizedCountry].push(event);
-      }
-    });
+    const calendar = ical({ name: 'Economic Calendar' });
 
-    // Generate combined calendar
-    const allEvents = importantEvents.map(event => {
+    for (const event of importantEvents) {
       const startDate = toUTCDate(event.public_date);
       const normalizedCountry = getNormalizedCountry(event.country);
       const emoji = getCountryEmoji(normalizedCountry);
 
-      return {
-        uid: event.calendar_key,
-        start: [
-          startDate.getUTCFullYear(),
-          startDate.getUTCMonth() + 1,
-          startDate.getUTCDate(),
-          startDate.getUTCHours(),
-          startDate.getUTCMinutes()
-        ],
-        end: [
-          startDate.getUTCFullYear(),
-          startDate.getUTCMonth() + 1,
-          startDate.getUTCDate(),
-          startDate.getUTCHours(),
-          startDate.getUTCMinutes()
-        ],
-        title: `${event.title}`,
-        description: '',
-        location: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous)
-      };
-    });
-
-    // Generate combined calendar
-    await new Promise((resolve, reject) => {
-      createEvents(allEvents, (error, value) => {
-        if (error) {
-          console.error('Error creating combined ICS:', error);
-          reject(error);
-        } else {
-          fs.writeFileSync(path.join(publicDir, 'economic-calendar.ics'), value);
-          console.log('Generated combined ICS file');
-          resolve(value);
-        }
+      calendar.createEvent({
+        start: startDate,
+        end: new Date(startDate.getTime() + 60 * 60 * 1000), // 1小时后
+        summary: event.title,
+        description: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous),
       });
-    });
+    }
 
-    // Generate individual country calendars
-    const countryPromises = Object.entries(eventsByCountry).map(([country, events]) => {
-      return generateCountryICS(country, events);
-    });
-
-    await Promise.all(countryPromises);
-    console.log('All ICS files generated successfully');
-
-    // Update index.html with generation time
-    const generationTime = new Date();
-    const timeString = generationTime.toLocaleString('zh-CN', { 
-      timeZone: 'Asia/Shanghai',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-    
-    const indexPath = path.join(__dirname, 'public', 'index.html');
-    let indexContent = await fsp.readFile(indexPath, 'utf8');
-    indexContent = indexContent.replace(
-      /日历生成时间：.*。<\/p>/,
-      `日历生成时间：${timeString}。</p>`
-    );
-    await fsp.writeFile(indexPath, indexContent, 'utf8');
-    
-    console.log('Calendar generated successfully at:', timeString);
+    return calendar.toString();
   } catch (error) {
-    console.error('Error generating ICS files:', error);
+    console.error('Error generating calendar content:', error);
     throw error;
   }
-};
+}
+
+// API endpoint to generate calendar
+app.get('/api/generate', async (req, res) => {
+  try {
+    const calendarContent = await generateCalendarContent();
+    
+    // 如果不是在 Vercel 环境，则保存到文件
+    if (!process.env.VERCEL) {
+      await fs.promises.writeFile(
+        path.join(__dirname, 'public', 'economic-calendar.ics'),
+        calendarContent
+      );
+    }
+    
+    res.writeHead(200, {
+      'Content-Type': 'text/calendar',
+      'Content-Disposition': 'attachment; filename=economic-calendar.ics'
+    });
+    res.end(calendarContent);
+  } catch (error) {
+    console.error('Error generating calendar:', error);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: error.message }));
+  }
+});
 
 // Ensure public directory exists
 const publicDir = path.join(__dirname, 'public');
@@ -338,37 +235,11 @@ if (!fs.existsSync(publicDir)) {
 // Serve static files
 app.use(express.static('public'));
 
-// API endpoint to generate ICS file
-app.get('/generate', async (req, res) => {
-  try {
-    await generateICS();
-    res.send({ success: true });
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-});
-
-// API endpoint to generate ICS file
-app.get('/api/generate', async (req, res) => {
-  try {
-    await generateICS();
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, message: 'Calendar generated successfully' }));
-    return;
-  } catch (error) {
-    console.error('Error generating calendar:', error);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: false, error: error.message }));
-    return;
-  }
-});
-
 // Start server if running directly (not in Vercel)
 if (require.main === module) {
   const port = process.env.PORT || 3000;
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-    generateICS();
   });
 }
 
