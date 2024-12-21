@@ -303,8 +303,8 @@ async function generateICS() {
     console.log('All ICS files generated successfully');
 
     // Update index.html with generation time
-    const now = new Date();
-    const timeString = now.toLocaleString('zh-CN', { 
+    const generationTime = new Date();
+    const timeString = generationTime.toLocaleString('zh-CN', { 
       timeZone: 'Asia/Shanghai',
       year: 'numeric',
       month: '2-digit',
@@ -318,7 +318,7 @@ async function generateICS() {
     let indexContent = await fsp.readFile(indexPath, 'utf8');
     indexContent = indexContent.replace(
       /日历生成时间：.*。<\/p>/,
-      `日历生成时间：${timeString}。`
+      `日历生成时间：${timeString}。</p>`
     );
     await fsp.writeFile(indexPath, indexContent, 'utf8');
     
