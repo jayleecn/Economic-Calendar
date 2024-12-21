@@ -125,9 +125,25 @@ const getImportanceStars = (importance) => {
   return '⭐️'.repeat(importance || 1);
 };
 
-// Format event description
+// Format description with actual, forecast and previous values
 const formatDescription = (actual, forecast, previous) => {
-  return `今值 ${actual || '-'}，预期 ${forecast || '-'}，前值 ${previous || '-'}`;
+  const parts = [];
+  if (actual !== undefined && actual !== null && actual !== '') {
+    parts.push(`今值: ${actual}`);
+  }
+  if (forecast !== undefined && forecast !== null && forecast !== '') {
+    parts.push(`预期: ${forecast}`);
+  }
+  if (previous !== undefined && previous !== null && previous !== '') {
+    parts.push(`前值: ${previous}`);
+  }
+  return parts.join(' | ');
+};
+
+// Format location with country and values
+const formatLocation = (emoji, country, actual, forecast, previous) => {
+  const values = formatDescription(actual, forecast, previous);
+  return `${emoji} ${country} | ${values}`;
 };
 
 // Generate ICS events for a specific country
@@ -165,8 +181,8 @@ const generateCountryICS = async (countryCode, events) => {
         startDate.getUTCMinutes()
       ],
       title: `${event.title}`,
-      description: formatDescription(event.actual, event.forecast, event.previous),
-      location: `${emoji} ${event.country}`
+      description: '',
+      location: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous)
     };
   });
 
@@ -258,8 +274,8 @@ const generateICS = async () => {
           startDate.getUTCMinutes()
         ],
         title: `${event.title}`,
-        description: formatDescription(event.actual, event.forecast, event.previous),
-        location: `${emoji} ${event.country}`
+        description: '',
+        location: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous)
       };
     });
 
