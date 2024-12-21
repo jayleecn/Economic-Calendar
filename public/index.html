@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国宏观事件日历订阅服务</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .subscription-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .subscription-link {
+            display: block;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .subscription-link:hover {
+            background-color: #0056b3;
+        }
+        .instructions {
+            margin-top: 30px;
+        }
+        .instructions h2 {
+            color: #444;
+            margin-top: 20px;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        li {
+            margin: 10px 0;
+        }
+        .url-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 0 20px;
+        }
+        .url-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #666;
+            background-color: #f8f9fa;
+            cursor: text;
+            user-select: all;
+        }
+        .copy-button {
+            position: relative;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #218838;
+        }
+        .copy-success {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+        }
+        .copy-button.copied .button-text {
+            visibility: hidden;
+        }
+        .copy-button.copied .copy-success {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 中国宏观事件日历订阅服务</h1>
+        
+        <div class="subscription-box">
+            <p>点击下方链接订阅经济日历：</p>
+            <a href="/cal.ics" class="subscription-link">订阅日历</a>
+            <div class="url-box">
+                <input type="text" id="calendarUrl" readonly value="http://localhost:3000/cal.ics" class="url-input">
+                <button onclick="copyUrl()" class="copy-button">
+                    <span class="button-text">复制链接</span>
+                    <span class="copy-success">已复制 ✓</span>
+                </button>
+            </div>
+            <p>（包含过去7天和未来7天的经济事件，每天00:00自动更新）</p>
+        </div>
+
+        <div class="instructions">
+            <h2>🍎 如何添加到 iCloud 日历</h2>
+            <ol>
+                <li>在 iPhone 上打开"设置"</li>
+                <li>前往"日历" > "账户"</li>
+                <li>选择"添加账户"</li>
+                <li>选择"添加订阅日历"</li>
+                <li>输入上方订阅链接</li>
+            </ol>
+
+            <h2>📱 如何添加到 Google Calendar</h2>
+            <ol>
+                <li>打开 Google Calendar</li>
+                <li>点击左侧"其他日历"旁边的 "+" 按钮</li>
+                <li>选择"从网址添加"</li>
+                <li>输入上方订阅链接</li>
+                <li>点击"添加日历"</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function copyUrl() {
+            const urlInput = document.getElementById('calendarUrl');
+            urlInput.select();
+            navigator.clipboard.writeText(urlInput.value).then(() => {
+                const button = document.querySelector('.copy-button');
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 动态设置日历URL
+        window.addEventListener('load', () => {
+            const urlInput = document.getElementById('calendarUrl');
+            const currentUrl = window.location.origin + '/cal.ics';
+            urlInput.value = currentUrl;
+        });
+    </script>
+</body>
+</html>
