@@ -3,205 +3,354 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>中国宏观事件日历订阅服务</title>
+    <title>全球经济日历订阅</title>
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-radius: 12px;
+            --spacing: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
+
         .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing);
         }
+
+        .header {
+            text-align: center;
+            padding: calc(var(--spacing) * 2.5) var(--spacing);
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing);
+            box-shadow: var(--shadow-lg);
+        }
+
         h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
+            margin: 0;
+            font-size: 2.5em;
+            color: var(--text-color);
+            letter-spacing: -0.5px;
         }
+
+        .header p {
+            margin: var(--spacing) auto 0;
+            color: #64748b;
+            font-size: 1.1em;
+            max-width: 600px;
+            line-height: 1.8;
+        }
+
+        .header a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .header a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
         .subscription-box {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        .subscription-link {
-            display: block;
             text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #007bff;
+            margin: calc(var(--spacing) * 3) 0;
+        }
+
+        .subscription-link, .country-link {
+            display: inline-block;
+            padding: 16px 44px;
+            background-color: var(--primary-color);
             color: white;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .subscription-link:hover {
-            background-color: #0056b3;
-        }
-        .instructions {
-            margin-top: 30px;
-        }
-        .instructions h2 {
-            color: #444;
-            margin-top: 20px;
-        }
-        ol {
-            padding-left: 20px;
-        }
-        li {
-            margin: 10px 0;
-        }
-        .url-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            padding: 0 20px;
-        }
-        .url-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            color: #666;
-            background-color: #f8f9fa;
-            cursor: text;
-            user-select: all;
-        }
-        .copy-button {
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1.2em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
             position: relative;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.2s;
+            overflow: hidden;
         }
-        .copy-button:hover {
-            background-color: #218838;
+
+        .subscription-link:hover, .country-link:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
-        .copy-success {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            white-space: nowrap;
+
+        .section-title {
+            text-align: center;
+            margin: calc(var(--spacing) * 3) 0 calc(var(--spacing) * 2);
+            font-size: 2em;
+            color: var(--text-color);
+            position: relative;
+            letter-spacing: -0.5px;
         }
-        .copy-button.copied .button-text {
-            visibility: hidden;
-        }
-        .copy-button.copied .copy-success {
+
+        .section-title::after {
+            content: '';
             display: block;
+            width: 60px;
+            height: 4px;
+            background-color: var(--primary-color);
+            margin: 12px auto;
+            border-radius: 2px;
         }
+
         .country-list {
-            margin-top: 30px;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
+            gap: calc(var(--spacing) * 1.5);
+            padding: var(--spacing) 0;
         }
+
         .country-card {
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            padding: 15px;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: calc(var(--spacing) * 1.5);
             text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
         }
+
+        .country-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .country-card h3 {
+            margin: 0 0 20px;
+            font-size: 1.4em;
+            color: var(--text-color);
+            letter-spacing: -0.3px;
+        }
+
         .country-link {
-            display: block;
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+            padding: 12px 24px;
+            font-size: 1em;
+            width: 80%;
         }
-        .country-link:hover {
-            background-color: #0056b3;
+
+        .instructions {
+            margin-top: calc(var(--spacing) * 3);
+            background-color: var(--card-bg);
+            padding: calc(var(--spacing) * 2);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+        }
+
+        .instructions h2 {
+            color: var(--text-color);
+            margin-top: 0;
+            font-size: 1.6em;
+            letter-spacing: -0.3px;
+        }
+
+        ol {
+            padding-left: calc(var(--spacing) * 2);
+        }
+
+        li {
+            margin: 15px 0;
+            color: #475569;
+            font-size: 1.05em;
+        }
+
+        .footer {
+            margin-top: calc(var(--spacing) * 3);
+            padding: calc(var(--spacing) * 1.5);
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95em;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .copy-success {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #16a34a;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+        }
+
+        .subscription-link.copied .copy-success,
+        .country-link.copied .copy-success {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --spacing: 16px;
+            }
+
+            .container {
+                padding: var(--spacing);
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+                padding: 0 var(--spacing);
+            }
+
+            .country-list {
+                grid-template-columns: 1fr;
+                gap: var(--spacing);
+            }
+
+            .instructions {
+                padding: var(--spacing);
+            }
+
+            .subscription-link, .country-link {
+                padding: 14px 28px;
+                font-size: 1.1em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📅 中国宏观事件日历订阅服务</h1>
-        
-        <div class="subscription-box">
-            <p>点击下方链接订阅完整经济日历：</p>
-            <a href="/cal.ics" class="subscription-link">订阅完整日历</a>
-            <div class="url-box">
-                <input type="text" id="calendarUrl" readonly value="http://localhost:3000/cal.ics" class="url-input">
-                <button onclick="copyUrl()" class="copy-button">
-                    <span class="button-text">复制链接</span>
-                    <span class="copy-success">已复制 ✓</span>
-                </button>
-            </div>
-            <p>（包含过去7天和未来7天的经济事件，每天00:00自动更新）</p>
+        <div class="header">
+            <h1>📅 全球经济日历</h1>
+            <p>日历来源：<a href="https://wallstreetcn.com/calendar" target="_blank">华尔街见闻</a>，包含未来 30 天的⭐️⭐️⭐️重要经济事件。
+                <br>每天北京时间 0 点自动更新，支持 iCloud、Google Calendar 等。</p>
         </div>
 
-        <h2 style="text-align: center; margin-top: 30px;">🌏 按国家订阅</h2>
+        <div class="subscription-box">
+            <a href="/economic-calendar.ics" class="subscription-link" onclick="handleSubscribe(event, this)">
+                一键订阅全球日历
+                <div class="copy-success">已复制订阅链接 ✓</div>
+            </a>
+        </div>
+
+        <h2 class="section-title">🌏 按国家/地区订阅</h2>
         <div class="country-list">
             <div class="country-card">
-                <h3>🇦🇺 澳大利亚</h3>
-                <a href="/cal-australia.ics" class="country-link">订阅日历</a>
-            </div>
-            <div class="country-card">
-                <h3>🇪🇺 欧元区</h3>
-                <a href="/cal-eurozone.ics" class="country-link">订阅日历</a>
+                <h3>🇺🇸 美国</h3>
+                <a href="/economic-calendar-united-states.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
             </div>
             <div class="country-card">
                 <h3>🇨🇳 中国</h3>
-                <a href="/cal-china.ics" class="country-link">订阅日历</a>
+                <a href="/economic-calendar-china.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
             </div>
             <div class="country-card">
-                <h3>🇫🇷 法国</h3>
-                <a href="/cal-france.ics" class="country-link">订阅日历</a>
-            </div>
-            <div class="country-card">
-                <h3>🇨🇦 加拿大</h3>
-                <a href="/cal-canada.ics" class="country-link">订阅日历</a>
-            </div>
-            <div class="country-card">
-                <h3>🇨🇭 瑞士</h3>
-                <a href="/cal-switzerland.ics" class="country-link">订阅日历</a>
-            </div>
-            <div class="country-card">
-                <h3>🇩🇪 德国</h3>
-                <a href="/cal-germany.ics" class="country-link">订阅日历</a>
-            </div>
-            <div class="country-card">
-                <h3>🇺🇸 美国</h3>
-                <a href="/cal-united-states.ics" class="country-link">订阅日历</a>
-            </div>
-            <div class="country-card">
-                <h3>🇮🇹 意大利</h3>
-                <a href="/cal-italy.ics" class="country-link">订阅日历</a>
-            </div>
-            <div class="country-card">
-                <h3>🇬🇧 英国</h3>
-                <a href="/cal-united-kingdom.ics" class="country-link">订阅日历</a>
+                <h3>🇪🇺 欧元区</h3>
+                <a href="/economic-calendar-eurozone.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
             </div>
             <div class="country-card">
                 <h3>🇯🇵 日本</h3>
-                <a href="/cal-japan.ics" class="country-link">订阅日历</a>
+                <a href="/economic-calendar-japan.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇬🇧 英国</h3>
+                <a href="/economic-calendar-united-kingdom.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇦🇺 澳大利亚</h3>
+                <a href="/economic-calendar-australia.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇩🇪 德国</h3>
+                <a href="/economic-calendar-germany.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇫🇷 法国</h3>
+                <a href="/economic-calendar-france.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇨🇭 瑞士</h3>
+                <a href="/economic-calendar-switzerland.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇨🇦 加拿大</h3>
+                <a href="/economic-calendar-canada.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇮🇹 意大利</h3>
+                <a href="/economic-calendar-italy.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
             </div>
             <div class="country-card">
                 <h3>🇳🇿 新西兰</h3>
-                <a href="/cal-new-zealand.ics" class="country-link">订阅日历</a>
+                <a href="/economic-calendar-new-zealand.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                    订阅日历
+                    <div class="copy-success">已复制订阅链接 ✓</div>
+                </a>
             </div>
         </div>
 
         <div class="instructions">
-            <h2>🍎 如何添加到 iCloud 日历</h2>
+            <h2>🍎 如何添加到 iCloud Calendar</h2>
             <ol>
                 <li>在 iPhone 上打开"设置"</li>
                 <li>前往"日历" > "账户"</li>
@@ -222,24 +371,30 @@
     </div>
 
     <script>
-        function copyUrl() {
-            const urlInput = document.getElementById('calendarUrl');
-            urlInput.select();
-            navigator.clipboard.writeText(urlInput.value).then(() => {
-                const button = document.querySelector('.copy-button');
-                button.classList.add('copied');
+        async function handleSubscribe(event, element) {
+            event.preventDefault();
+            
+            // 获取完整的订阅链接
+            const url = window.location.origin + element.getAttribute('href');
+            
+            try {
+                // 复制链接到剪贴板
+                await navigator.clipboard.writeText(url);
+                
+                // 显示复制成功提示
+                element.classList.add('copied');
+                
+                // 延迟后再跳转，让用户能看到复制成功的提示
                 setTimeout(() => {
-                    button.classList.remove('copied');
-                }, 2000);
-            });
+                    // 移除复制成功提示
+                    element.classList.remove('copied');
+                    // 跳转到日历链接
+                    window.location.href = url;
+                }, 800); // 等待 800ms
+            } catch (error) {
+                console.error('复制失败:', error);
+            }
         }
-
-        // 动态设置日历URL
-        window.addEventListener('load', () => {
-            const urlInput = document.getElementById('calendarUrl');
-            const currentUrl = window.location.origin + '/cal.ics';
-            urlInput.value = currentUrl;
-        });
     </script>
 </body>
 </html>

@@ -11,26 +11,95 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 国家代码映射
-const COUNTRY_CODES = {
-  'Australia': 'AU',
-  'Eurozone': 'EU',
-  'China': 'CN',
-  'France': 'FR',
-  'Canada': 'CA',
-  'Switzerland': 'CH',
-  'Germany': 'DE',
-  'United States': 'US',
-  'Italy': 'IT',
-  'United Kingdom': 'GB',
-  'Japan': 'JP',
-  'New Zealand': 'NZ'
+let COUNTRY_CODES = {};
+
+// 国家代码和名称映射
+const COUNTRY_NAMES = {
+  'AU': 'australia',
+  'EA': 'eurozone',
+  'CN': 'china',
+  'FR': 'france',
+  'CA': 'canada',
+  'CH': 'switzerland',
+  'DE': 'germany',
+  'US': 'united-states',
+  'IT': 'italy',
+  'UK': 'united-kingdom',
+  'JP': 'japan',
+  'NZ': 'new-zealand',
+  'ES': 'spain',
+  'KR': 'south-korea',
+  'HK': 'hong-kong',
+  'SG': 'singapore',
+  'NO': 'norway',
+  'SE': 'sweden'
 };
 
-// Ensure public directory exists
-const publicDir = path.join(__dirname, 'public');
-if (!existsSync(publicDir)) {
-  mkdirSync(publicDir, { recursive: true });
-}
+// 国家代码和emoji映射
+const COUNTRY_EMOJIS = {
+  'AU': '🇦🇺',
+  'EA': '🇪🇺',
+  'CN': '🇨🇳',
+  'FR': '🇫🇷',
+  'CA': '🇨🇦',
+  'CH': '🇨🇭',
+  'DE': '🇩🇪',
+  'US': '🇺🇸',
+  'IT': '🇮🇹',
+  'UK': '🇬🇧',
+  'JP': '🇯🇵',
+  'NZ': '🇳🇿',
+  'ES': '🇪🇸',
+  'KR': '🇰🇷',
+  'HK': '🇭🇰',
+  'SG': '🇸🇬',
+  'NO': '🇳🇴',
+  'SE': '🇸🇪'
+};
+
+// 更新国家代码映射
+const updateCountryCodes = async () => {
+  try {
+    console.log('Updating country codes from API...');
+    const response = await axios.get('https://api-one-wscn.awtmt.com/apiv1/finance/countries');
+    if (!response.data?.data?.items || !Array.isArray(response.data.data.items)) {
+      console.error('Invalid country API response format:', response.data);
+      return;
+    }
+
+    const newCountryCodes = {};
+    response.data.data.items.forEach(item => {
+      newCountryCodes[item.country_id] = [item.country_name, item.flag_uri];
+    });
+
+    COUNTRY_CODES = newCountryCodes;
+    console.log(`Updated country codes, total: ${Object.keys(COUNTRY_CODES).length} countries`);
+  } catch (error) {
+    console.error('Error updating country codes:', error);
+  }
+};
+
+// 获取标准化的国家代码
+const getNormalizedCountry = (country) => {
+  // 先尝试直接匹配国家代码
+  if (COUNTRY_CODES[country]) {
+    return country;
+  }
+  
+  // 再尝试匹配中文名称
+  for (const [code, [name]] of Object.entries(COUNTRY_CODES)) {
+    if (country === name) {
+      return code;
+    }
+  }
+  
+  return null;
+};
+
+// 获取国家的emoji
+const getCountryEmoji = (countryCode) => {
+  return COUNTRY_EMOJIS[countryCode] || '';
+};
 
 // Convert timestamp to UTC Date object
 const toUTCDate = (timestamp) => {
@@ -46,23 +115,33 @@ const getFlag = (countryCode) => {
   }
 };
 
+// Get importance stars
+const getImportanceStars = (importance) => {
+  return '⭐️'.repeat(importance || 1);
+};
+
 // Format event description
 const formatDescription = (actual, forecast, previous) => {
   return `今值 ${actual || '-'}，预期 ${forecast || '-'}，前值 ${previous || '-'}`;
 };
 
 // Generate ICS events for a specific country
-const generateCountryICS = async (countryName, events) => {
-  const countryEvents = events.filter(event => event.country === countryName);
+const generateCountryICS = async (countryCode, events) => {
+  const countryName = COUNTRY_CODES[countryCode][0];
+  console.log(`Generating calendar for ${countryName} with ${events.length} events`);
   
-  if (countryEvents.length === 0) {
-    console.log(`No events found for ${countryName}`);
+  // 只保留重要性为 3 的事件
+  const importantEvents = events.filter(event => event.importance === 3);
+  
+  if (importantEvents.length === 0) {
+    console.log(`No important events found for ${countryName}`);
     return;
   }
 
-  const calendarEvents = countryEvents.map(event => {
+  const calendarEvents = importantEvents.map(event => {
     const startDate = toUTCDate(event.public_date);
-    const endDate = new Date(startDate.getTime() + 60000); // Add 1 minute
+    const normalizedCountry = getNormalizedCountry(event.country);
+    const emoji = getCountryEmoji(normalizedCountry);
 
     return {
       uid: event.calendar_key,
@@ -74,15 +153,15 @@ const generateCountryICS = async (countryName, events) => {
         startDate.getUTCMinutes()
       ],
       end: [
-        endDate.getUTCFullYear(),
-        endDate.getUTCMonth() + 1,
-        endDate.getUTCDate(),
-        endDate.getUTCHours(),
-        endDate.getUTCMinutes()
+        startDate.getUTCFullYear(),
+        startDate.getUTCMonth() + 1,
+        startDate.getUTCDate(),
+        startDate.getUTCHours(),
+        startDate.getUTCMinutes()
       ],
-      title: `${getFlag(event.country_id)} ${event.title}`,
+      title: `${event.title}`,
       description: formatDescription(event.actual, event.forecast, event.previous),
-      location: `${getFlag(event.country_id)} ${event.country}`
+      location: `${emoji} ${event.country}`
     };
   });
 
@@ -92,11 +171,16 @@ const generateCountryICS = async (countryName, events) => {
         console.error(`Error creating ICS for ${countryName}:`, error);
         reject(error);
       } else {
-        const fileName = countryName.toLowerCase().replace(/\s+/g, '-');
-        const filePath = path.join(publicDir, `cal-${fileName}.ics`);
-        writeFileSync(filePath, value);
-        console.log(`Generated ICS file for ${countryName} with ${calendarEvents.length} events`);
-        resolve(value);
+        const fileName = COUNTRY_NAMES[countryCode] || countryCode.toLowerCase();
+        const filePath = path.join(publicDir, `economic-calendar-${fileName}.ics`);
+        try {
+          writeFileSync(filePath, value);
+          console.log(`Successfully wrote calendar file for ${countryName} to ${filePath}`);
+          resolve(value);
+        } catch (error) {
+          console.error(`Error writing file for ${countryName}:`, error);
+          reject(error);
+        }
       }
     });
   });
@@ -105,14 +189,17 @@ const generateCountryICS = async (countryName, events) => {
 // Generate all ICS files
 const generateICS = async () => {
   try {
+    // 先更新国家代码
+    await updateCountryCodes();
+    
     console.log('Generating ICS files...');
     
     // Calculate time range (Beijing time)
     const now = new Date();
-    const start = Math.floor(startOfDay(addDays(now, -7)).getTime() / 1000);
-    const end = Math.floor(endOfDay(addDays(now, 7)).getTime() / 1000);
+    const start = Math.floor(startOfDay(now).getTime() / 1000); // 从今天开始
+    const end = Math.floor(endOfDay(addDays(now, 30)).getTime() / 1000); // 到30天后
 
-    console.log(`Time range: ${start} to ${end}`);
+    console.log(`Time range: ${new Date(start * 1000).toISOString()} to ${new Date(end * 1000).toISOString()}`);
 
     // Fetch data from API
     const response = await axios.get('https://api-one-wscn.awtmt.com/apiv1/finance/macrodatas', {
@@ -127,10 +214,27 @@ const generateICS = async () => {
     const items = response.data.data.items;
     console.log(`Received ${items.length} events from API`);
 
+    // 只保留重要性为 3 的事件
+    const importantEvents = items.filter(event => event.importance === 3);
+    console.log(`Filtered ${importantEvents.length} important events (importance = 3)`);
+
+    // Group events by normalized country
+    const eventsByCountry = {};
+    importantEvents.forEach(event => {
+      const normalizedCountry = getNormalizedCountry(event.country);
+      if (normalizedCountry) {
+        if (!eventsByCountry[normalizedCountry]) {
+          eventsByCountry[normalizedCountry] = [];
+        }
+        eventsByCountry[normalizedCountry].push(event);
+      }
+    });
+
     // Generate combined calendar
-    const allEvents = items.map(event => {
+    const allEvents = importantEvents.map(event => {
       const startDate = toUTCDate(event.public_date);
-      const endDate = new Date(startDate.getTime() + 60000);
+      const normalizedCountry = getNormalizedCountry(event.country);
+      const emoji = getCountryEmoji(normalizedCountry);
 
       return {
         uid: event.calendar_key,
@@ -142,15 +246,15 @@ const generateICS = async () => {
           startDate.getUTCMinutes()
         ],
         end: [
-          endDate.getUTCFullYear(),
-          endDate.getUTCMonth() + 1,
-          endDate.getUTCDate(),
-          endDate.getUTCHours(),
-          endDate.getUTCMinutes()
+          startDate.getUTCFullYear(),
+          startDate.getUTCMonth() + 1,
+          startDate.getUTCDate(),
+          startDate.getUTCHours(),
+          startDate.getUTCMinutes()
         ],
-        title: `${getFlag(event.country_id)} ${event.title}`,
+        title: `${event.title}`,
         description: formatDescription(event.actual, event.forecast, event.previous),
-        location: `${getFlag(event.country_id)} ${event.country}`
+        location: `${emoji} ${event.country}`
       };
     });
 
@@ -161,7 +265,7 @@ const generateICS = async () => {
           console.error('Error creating combined ICS:', error);
           reject(error);
         } else {
-          writeFileSync(path.join(publicDir, 'cal.ics'), value);
+          writeFileSync(path.join(publicDir, 'economic-calendar.ics'), value);
           console.log('Generated combined ICS file');
           resolve(value);
         }
@@ -169,15 +273,23 @@ const generateICS = async () => {
     });
 
     // Generate individual country calendars
-    const countries = Object.keys(COUNTRY_CODES);
-    await Promise.all(countries.map(country => generateCountryICS(country, items)));
+    const countryPromises = Object.entries(eventsByCountry).map(([country, events]) => {
+      return generateCountryICS(country, events);
+    });
 
+    await Promise.all(countryPromises);
     console.log('All ICS files generated successfully');
   } catch (error) {
     console.error('Error generating ICS files:', error);
     throw error;
   }
 };
+
+// Ensure public directory exists
+const publicDir = path.join(__dirname, 'public');
+if (!existsSync(publicDir)) {
+  mkdirSync(publicDir, { recursive: true });
+}
 
 // Serve static files
 app.use(express.static('public'));
