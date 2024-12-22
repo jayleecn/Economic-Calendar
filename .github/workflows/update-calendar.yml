@@ -59,7 +59,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add public/*.ics
+          git add -f public/*.ics
           git add public/index.html
-          git commit -m "chore: update calendar files" || exit 0
+          git commit -m "Update economic calendar" || exit 0
           git push
