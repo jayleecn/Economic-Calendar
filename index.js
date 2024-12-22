@@ -386,7 +386,9 @@ module.exports = {
   generateAllCalendars
 };
 
-// 启动服务器
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// 只在直接运行时启动服务器（不是被 require 时）
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
