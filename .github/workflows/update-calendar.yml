@@ -1,8 +1,8 @@
-name: Update Economic Calendar
+name: Update Economic Calendar and Trigger Vercel Deployment
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # 每10分钟运行一次
+    - cron: '*/5 * * * *'  # 每5分钟运行一次
   workflow_dispatch:  # 允许手动触发
 
 permissions:
@@ -87,3 +87,11 @@ jobs:
           git add public/index.html
           git commit -m "Update economic calendar" || exit 0
           git push
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Deployment
+        run: |
+          curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_wcseVHHfVb6Y2WDxDCKYVy17ainn/dmruzc4PPO"
+          echo "Vercel deployment triggered successfully"
