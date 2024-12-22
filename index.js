@@ -3,7 +3,7 @@ const axios = require('axios');
 const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('path');
-const { addDays, startOfDay, endOfDay } = require('date-fns');
+const { addDays, startOfDay, endOfDay, subDays } = require('date-fns');
 const ical = require('ical-generator').default;
 const countryFlagEmoji = require('country-flag-emoji');
 
@@ -142,7 +142,7 @@ async function generateCalendarContent() {
     
     // Calculate time range (Beijing time)
     const now = new Date();
-    const startTime = startOfDay(now);
+    const startTime = subDays(startOfDay(now), 1); // 从昨天开始
     const endTime = endOfDay(addDays(now, 30));
 
     console.log('Fetching events from', startTime, 'to', endTime);
@@ -194,7 +194,7 @@ async function generateCountryCalendar(countryId, countryName) {
     
     // Calculate time range (Beijing time)
     const now = new Date();
-    const startTime = startOfDay(now);
+    const startTime = subDays(startOfDay(now), 1); // 从昨天开始
     const endTime = endOfDay(addDays(now, 30));
 
     console.log('Fetching events from', startTime, 'to', endTime);
@@ -256,7 +256,7 @@ async function generateAllCalendars() {
     
     // Calculate time range (Beijing time)
     const now = new Date();
-    const startTime = startOfDay(now);
+    const startTime = subDays(startOfDay(now), 1); // 从昨天开始
     const endTime = endOfDay(addDays(now, 30));
 
     console.log('Fetching events from', startTime, 'to', endTime);
