@@ -245,19 +245,30 @@ async function generateCountryCalendar(countryId, countryName) {
   }
 }
 
+// 更新首页生成时间
+async function updateGenerationTime() {
+  try {
+    const now = new Date();
+    const formattedTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const indexPath = path.join(__dirname, 'public', 'index.html');
+    let content = await fsp.readFile(indexPath, 'utf8');
+    content = content.replace(/日历最后生成时间：.*?。/, `日历最后生成时间：${formattedTime}。`);
+    await fsp.writeFile(indexPath, content, 'utf8');
+    console.log('Updated generation time in index.html');
+  } catch (error) {
+    console.error('Error updating generation time:', error);
+  }
+}
+
 // 生成所有日历
 async function generateAllCalendars() {
   try {
     console.log('Generating all calendars...');
     
-    // 确保 public 目录存在
-    const publicDir = path.join(__dirname, 'public');
-    await fs.promises.mkdir(publicDir, { recursive: true });
-    
     // Calculate time range (Beijing time)
     const now = new Date();
-    const startTime = subDays(startOfDay(now), 0); // 从昨天开始
-    const endTime = endOfDay(addDays(now, 7)); // 改为 7 天
+    const startTime = subDays(startOfDay(now), 0); // 从今天开始
+    const endTime = endOfDay(addDays(now, 7)); // 7 天
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
@@ -308,7 +319,7 @@ async function generateAllCalendars() {
     }
 
     // 保存全球日历
-    const globalCalendarPath = path.join(publicDir, 'economic-calendar.ics');
+    const globalCalendarPath = path.join(__dirname, 'public', 'economic-calendar.ics');
     await fs.promises.writeFile(globalCalendarPath, calendar.toString());
     console.log('Global calendar generated');
 
@@ -339,21 +350,14 @@ async function generateAllCalendars() {
       }
 
       const fileName = `economic-calendar-${countryName}.ics`;
-      const filePath = path.join(publicDir, fileName);
+      const filePath = path.join(__dirname, 'public', fileName);
       await fs.promises.writeFile(filePath, countryCalendar.toString());
       console.log(`Calendar generated for ${country} (${countryName}): ${data.events.length} events`);
     }
 
-    // 更新 index.html 中的生成时间
-    const indexPath = path.join(publicDir, 'index.html');
-    let indexContent = await fs.promises.readFile(indexPath, 'utf8');
-    const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000); // 8小时的毫秒数
-    const currentTime = beijingTime.toISOString().slice(0, 16).replace('T', ' ');
-    indexContent = indexContent.replace(
-      /日历最后生成时间：.*。/,
-      `日历最后生成时间：${currentTime}。`
-    );
-    await fs.promises.writeFile(indexPath, indexContent, 'utf8');
+    // 更新首页生成时间
+    await updateGenerationTime();
+    
     console.log('All calendars generated successfully');
   } catch (error) {
     console.error('Error generating calendars:', error);
