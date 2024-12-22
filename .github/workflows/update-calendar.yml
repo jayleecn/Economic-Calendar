@@ -16,6 +16,11 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          
       - name: Setup directories
         run: |
           mkdir -p public
@@ -23,8 +28,8 @@ jobs:
       - name: Download global calendar
         run: |
           response=$(curl -s "https://economic-calendar-lovat.vercel.app/api/generate")
-          if [[ $response == BEGIN:VCALENDAR* ]]; then
-            echo "$response" > public/economic-calendar.ics
+          if echo "$response" | jq -e '.success == true' > /dev/null 2>&1; then
+            echo "$response" | jq -r '.data' > public/economic-calendar.ics
           else
             echo "Error downloading global calendar: $response"
             exit 1
@@ -36,8 +41,8 @@ jobs:
             local country=$1
             local file="public/economic-calendar-$2.ics"
             local response=$(curl -s "https://economic-calendar-lovat.vercel.app/api/generate?country=$country")
-            if [[ $response == BEGIN:VCALENDAR* ]]; then
-              echo "$response" > "$file"
+            if echo "$response" | jq -e '.success == true' > /dev/null 2>&1; then
+              echo "$response" | jq -r '.data' > "$file"
               echo "Successfully downloaded calendar for $2"
             else
               echo "Error downloading calendar for $2: $response"
