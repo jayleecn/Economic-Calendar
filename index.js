@@ -143,7 +143,7 @@ async function generateCalendarContent() {
     // Calculate time range (Beijing time)
     const now = new Date();
     const startTime = subDays(startOfDay(now), 1); // 从昨天开始
-    const endTime = endOfDay(addDays(now, 30));
+    const endTime = endOfDay(addDays(now, 6)); // 改为 6 天后（总共 7 天）
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
@@ -195,7 +195,7 @@ async function generateCountryCalendar(countryId, countryName) {
     // Calculate time range (Beijing time)
     const now = new Date();
     const startTime = subDays(startOfDay(now), 1); // 从昨天开始
-    const endTime = endOfDay(addDays(now, 30));
+    const endTime = endOfDay(addDays(now, 6)); // 改为 6 天后（总共 7 天）
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
@@ -256,8 +256,8 @@ async function generateAllCalendars() {
     
     // Calculate time range (Beijing time)
     const now = new Date();
-    const startTime = subDays(startOfDay(now), 1); // 从昨天开始
-    const endTime = endOfDay(addDays(now, 30));
+    const startTime = subDays(startOfDay(now), 0); // 从昨天开始
+    const endTime = endOfDay(addDays(now, 7)); // 改为 7 天
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
