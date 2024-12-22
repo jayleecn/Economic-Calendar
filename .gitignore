@@ -1,9 +1,6 @@
 # Node.js
 node_modules/
 
-# Generated files
-public/*.ics
-
 # Environment variables
 .env
 
