@@ -283,7 +283,7 @@ async function generateAllCalendars() {
     const items = response.data.data.items;
     console.log(`Fetched ${items.length} events`);
 
-    // Filter important events
+    // 筛选重要事件
     const importantEvents = items.filter(event => event.importance === 3);
     console.log(`Filtered ${importantEvents.length} important events (importance = 3)`);
 
@@ -368,148 +368,25 @@ async function generateAllCalendars() {
 // API endpoint to generate calendar
 app.get('/api/generate', async (req, res) => {
   try {
-    const { country } = req.query;
-    let calendarContent;
-
-    // 确保先更新国家代码
-    await updateCountryCodes();
-
-    if (country) {
-      if (!COUNTRY_NAMES[country]) {
-        return res.status(400).json({
-          success: false,
-          error: `Invalid country code: ${country}`
-        });
-      }
-      calendarContent = await generateCountryCalendar(country, COUNTRY_NAMES[country]);
-    } else {
-      calendarContent = await generateCalendarContent();
-    }
-
-    // 设置正确的内容类型
-    res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename=economic-calendar${country ? '-' + COUNTRY_NAMES[country] : ''}.ics`);
-    res.send(calendarContent);
+    await generateAllCalendars();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true }));
   } catch (error) {
-    console.error('Error in /api/generate:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
+    console.error('Error generating calendar:', error);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: error.message }));
   }
 });
-
-// 生成所有日历
-async function generateAllCalendars() {
-  try {
-    console.log('Generating all calendars...');
-    
-    // Calculate time range (Beijing time)
-    const now = new Date();
-    const startTime = subDays(startOfDay(now), 0); // 从今天开始
-    const endTime = endOfDay(addDays(now, 7)); // 7 天
-
-    console.log('Fetching events from', startTime, 'to', endTime);
-
-    // 获取所有事件
-    console.log('Sending request to API...');
-    const response = await axios.get('https://api-one-wscn.awtmt.com/apiv1/finance/macrodatas', {
-      params: {
-        start: Math.floor(startTime.getTime() / 1000),
-        end: Math.floor(endTime.getTime() / 1000),
-      },
-    });
-
-    console.log('API Response:', JSON.stringify(response.data, null, 2));
-
-    // 检查 API 响应
-    if (!response.data?.data?.items) {
-      console.error('Invalid API response structure. Response:', JSON.stringify(response.data));
-      throw new Error('Invalid API response format');
-    }
-
-    const items = response.data.data.items;
-    console.log(`Fetched ${items.length} events`);
-
-    // Filter important events
-    const importantEvents = items.filter(event => event.importance === 3);
-    console.log(`Filtered ${importantEvents.length} important events (importance = 3)`);
-
-    // Create calendar
-    const calendar = ical({
-      name: '全球重要经济日历',
-      description: '来自华尔街见闻的重要经济数据',
-      timezone: 'Asia/Shanghai'
-    });
-
-    // 按国家分组事件
-    const eventsByCountry = {};
-    for (const event of importantEvents) {
-      const startDate = new Date(event.public_date * 1000);
-      calendar.createEvent({
-        start: startDate,
-        end: startDate,
-        summary: event.title,
-        description: formatDescription(event),
-        location: formatLocation(event),
-        url: event.uri
-      });
-
-      // 按国家收集事件
-      if (event.country_id) {
-        if (!eventsByCountry[event.country_id]) {
-          eventsByCountry[event.country_id] = [];
-        }
-        eventsByCountry[event.country_id].push(event);
-      }
-    }
-
-    // 更新首页生成时间
-    await updateGenerationTime();
-
-    // 返回生成的日历内容
-    return {
-      global: calendar.toString(),
-      byCountry: Object.fromEntries(
-        Object.entries(eventsByCountry).map(([country, events]) => {
-          const countryCalendar = ical({
-            name: `${country} 重要经济日历`,
-            description: `来自华尔街见闻的 ${country} 重要经济数据`,
-            timezone: 'Asia/Shanghai'
-          });
-
-          for (const event of events) {
-            const startDate = new Date(event.public_date * 1000);
-            countryCalendar.createEvent({
-              start: startDate,
-              end: startDate,
-              summary: event.title,
-              description: formatDescription(event),
-              location: formatLocation(event),
-              url: event.uri
-            });
-          }
-
-          return [country, countryCalendar.toString()];
-        })
-      )
-    };
-  } catch (error) {
-    console.error('Error generating calendars:', error);
-    throw error;
-  }
-}
 
 // Serve static files
 app.use(express.static('public'));
 
-// Start server if running directly (not in Vercel)
-if (require.main === module) {
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
-}
+// 导出函数供构建脚本使用
+module.exports = {
+  generateAllCalendars
+};
 
-// Export for Vercel
-module.exports = app;
+// 启动服务器
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
