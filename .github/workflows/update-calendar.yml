@@ -22,29 +22,48 @@ jobs:
           
       - name: Download global calendar
         run: |
-          curl -o public/economic-calendar.ics https://economic-calendar-lovat.vercel.app/api/generate
+          response=$(curl -s "https://economic-calendar-lovat.vercel.app/api/generate")
+          if [[ $response == BEGIN:VCALENDAR* ]]; then
+            echo "$response" > public/economic-calendar.ics
+          else
+            echo "Error downloading global calendar: $response"
+            exit 1
+          fi
           
       - name: Download country calendars
         run: |
+          download_calendar() {
+            local country=$1
+            local file="public/economic-calendar-$2.ics"
+            local response=$(curl -s "https://economic-calendar-lovat.vercel.app/api/generate?country=$country")
+            if [[ $response == BEGIN:VCALENDAR* ]]; then
+              echo "$response" > "$file"
+              echo "Successfully downloaded calendar for $2"
+            else
+              echo "Error downloading calendar for $2: $response"
+              exit 1
+            fi
+          }
+
           # 下载各个国家的日历
-          curl -o "public/economic-calendar-united-states.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=US"
-          curl -o "public/economic-calendar-china.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=CN"
-          curl -o "public/economic-calendar-eurozone.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=EA"
-          curl -o "public/economic-calendar-japan.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=JP"
-          curl -o "public/economic-calendar-united-kingdom.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=UK"
-          curl -o "public/economic-calendar-australia.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=AU"
-          curl -o "public/economic-calendar-germany.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=DE"
-          curl -o "public/economic-calendar-france.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=FR"
-          curl -o "public/economic-calendar-canada.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=CA"
-          curl -o "public/economic-calendar-switzerland.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=CH"
-          curl -o "public/economic-calendar-italy.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=IT"
-          curl -o "public/economic-calendar-new-zealand.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=NZ"
-          curl -o "public/economic-calendar-spain.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=ES"
-          curl -o "public/economic-calendar-south-korea.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=KR"
-          curl -o "public/economic-calendar-hong-kong.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=HK"
-          curl -o "public/economic-calendar-singapore.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=SG"
-          curl -o "public/economic-calendar-norway.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=NO"
-          curl -o "public/economic-calendar-sweden.ics" "https://economic-calendar-lovat.vercel.app/api/generate?country=SE"
+          download_calendar "US" "united-states"
+          download_calendar "CN" "china"
+          download_calendar "EA" "eurozone"
+          download_calendar "JP" "japan"
+          download_calendar "UK" "united-kingdom"
+          download_calendar "AU" "australia"
+          download_calendar "DE" "germany"
+          download_calendar "FR" "france"
+          download_calendar "CA" "canada"
+          download_calendar "CH" "switzerland"
+          download_calendar "IT" "italy"
+          download_calendar "NZ" "new-zealand"
+          download_calendar "ES" "spain"
+          download_calendar "KR" "south-korea"
+          download_calendar "HK" "hong-kong"
+          download_calendar "SG" "singapore"
+          download_calendar "NO" "norway"
+          download_calendar "SE" "sweden"
           
       - name: List files
         run: |
