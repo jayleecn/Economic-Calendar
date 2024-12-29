@@ -303,17 +303,18 @@ async function generateAllCalendars() {
       timezone: 'Asia/Shanghai'
     });
 
-    for (const event of importantEvents) {
+    // 使用所有重要事件生成全球日历
+    importantEvents.forEach(event => {
       const startDate = toUTCDate(event.public_date);
       const emoji = getCountryEmoji(event.country_id);
       calendar.createEvent({
         start: startDate,
         end: startDate,
-        summary: event.title,
-        description: event.title,
+        summary: `${emoji} ${event.title}`,
+        description: formatDescription(event.actual, event.forecast, event.previous),
         location: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous)
       });
-    }
+    });
 
     // 保存全球日历
     const globalCalendarPath = path.join(__dirname, 'public', 'economic-calendar.ics');
