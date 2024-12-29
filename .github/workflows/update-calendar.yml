@@ -1,0 +1,37 @@
+name: Update Economic Calendar
+
+on:
+  schedule:
+    - cron: '* * * * *'  # 每分钟运行
+  workflow_dispatch:        # 支持手动触发
+
+jobs:
+  update-calendar:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      
+      - name: Setup Git
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Generate calendar files
+        run: npm run build
+        
+      - name: Commit and push if changed
+        run: |
+          git add public/*.ics
+          git commit -m "chore: update calendar data [skip ci]" || exit 0
+          git push
