@@ -85,54 +85,36 @@ const getCountryEmoji = (countryCode) => {
 };
 
 // Convert timestamp to UTC Date object (considering Beijing timezone)
-function toUTCDate(timestamp) {
-  // Convert timestamp to milliseconds if it's in seconds
-  const timestampMs = timestamp * 1000;
-  // Create a date object in the local timezone
-  const date = new Date(timestampMs);
-  // Return the date object
+const toUTCDate = (timestamp) => {
+  const date = new Date(timestamp * 1000);
   return date;
-}
-
-// 获取时间范围（考虑北京时区）
-function getTimeRange(days = 7) {
-  // 获取当前北京时间
-  const now = new Date();
-  // 设置为当天的开始（00:00:00）
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  // 设置为未来第 N 天的结束（23:59:59.999）
-  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + days, 23, 59, 59, 999);
-  
-  return {
-    startTime: Math.floor(start.getTime() / 1000),
-    endTime: Math.floor(end.getTime() / 1000)
-  };
-}
+};
 
 // Get country flag emoji
 const getFlag = (countryCode) => {
-  try {
-    return countryFlagEmoji.get(countryCode)?.emoji || '';
-  } catch {
-    return '';
-  }
+  if (!countryCode) return '';
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt());
+  return String.fromCodePoint(...codePoints);
 };
 
 // Get importance stars
 const getImportanceStars = (importance) => {
-  return '⭐️'.repeat(importance || 1);
+  return '⭐️'.repeat(importance);
 };
 
 // Format description with actual, forecast and previous values
 const formatDescription = (actual, forecast, previous) => {
   const parts = [];
-  if (actual !== undefined && actual !== null && actual !== '') {
+  if (actual !== null && actual !== '') {
     parts.push(`今值: ${actual}`);
   }
-  if (forecast !== undefined && forecast !== null && forecast !== '') {
+  if (forecast !== null && forecast !== '') {
     parts.push(`预期: ${forecast}`);
   }
-  if (previous !== undefined && previous !== null && previous !== '') {
+  if (previous !== null && previous !== '') {
     parts.push(`前值: ${previous}`);
   }
   return parts.join(' | ');
@@ -156,11 +138,10 @@ async function generateCalendarContent() {
     console.log('Generating calendar content...');
     
     // 获取时间范围
-    const { startTime, endTime } = getTimeRange();
+    const now = new Date();
+    const startTime = Math.floor(now.getTime() / 1000);
+    const endTime = Math.floor(addDays(now, 7).getTime() / 1000);
 
-    console.log('Current time:', new Date().toISOString());
-    console.log('Start time:', new Date(startTime * 1000).toISOString());
-    console.log('End time:', new Date(endTime * 1000).toISOString());
     console.log('Fetching events from', startTime, 'to', endTime);
 
     // Fetch events
@@ -206,14 +187,16 @@ async function generateCalendarContent() {
 // 生成单个国家的日历内容
 async function generateCountryCalendar(countryId, countryName) {
   try {
-    console.log(`Generating calendar for ${countryId} (${countryName})...`);
+    // 先更新国家代码
+    await updateCountryCodes();
+    
+    console.log(`Generating calendar for ${countryName}...`);
     
     // 获取时间范围
-    const { startTime, endTime } = getTimeRange();
+    const now = new Date();
+    const startTime = Math.floor(now.getTime() / 1000);
+    const endTime = Math.floor(addDays(now, 7).getTime() / 1000);
 
-    console.log('Current time:', new Date().toISOString());
-    console.log('Start time:', new Date(startTime * 1000).toISOString());
-    console.log('End time:', new Date(endTime * 1000).toISOString());
     console.log('Fetching events from', startTime, 'to', endTime);
 
     // Fetch events
@@ -221,29 +204,25 @@ async function generateCountryCalendar(countryId, countryName) {
       params: {
         start: startTime,
         end: endTime,
-        country: countryId,
       },
     });
 
     const items = response.data.data.items;
-    console.log(`Fetched ${items.length} events for ${countryId}`);
+    console.log(`Fetched ${items.length} events`);
 
-    // Filter important events
-    const importantEvents = items.filter(event => event.importance === 3);
-    console.log(`Filtered ${importantEvents.length} important events (importance = 3)`);
-
-    // 如果没有重要事件，返回 null
-    if (importantEvents.length === 0) {
-      return null;
-    }
+    // Filter important events for the specific country
+    const countryEvents = items.filter(event => 
+      event.importance === 3 && event.country_id === countryId
+    );
+    console.log(`Filtered ${countryEvents.length} important events for ${countryName}`);
 
     // Create calendar
     const calendar = ical({
-      name: `${countryName} Economic Calendar`,
+      name: `${countryName}经济日历`,
       timezone: 'Asia/Shanghai'
     });
 
-    for (const event of importantEvents) {
+    for (const event of countryEvents) {
       const startDate = toUTCDate(event.public_date);
       const emoji = getCountryEmoji(event.country_id);
       calendar.createEvent({
@@ -257,7 +236,7 @@ async function generateCountryCalendar(countryId, countryName) {
 
     return calendar.toString();
   } catch (error) {
-    console.error(`Error generating calendar for ${countryId}:`, error);
+    console.error(`Error generating calendar for ${countryName}:`, error);
     throw error;
   }
 }
@@ -267,13 +246,20 @@ async function updateGenerationTime() {
   try {
     const now = new Date();
     const formattedTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const indexPath = path.join(__dirname, 'public', 'index.html');
-    let content = await fsp.readFile(indexPath, 'utf8');
-    content = content.replace(/日历最后生成时间：.*?。/, `日历最后生成时间：${formattedTime}。`);
-    await fsp.writeFile(indexPath, content, 'utf8');
-    console.log('Updated generation time in index.html');
+    
+    const filePath = path.join(__dirname, 'public', 'index.html');
+    let content = await fsp.readFile(filePath, 'utf8');
+    
+    content = content.replace(
+      /日历最后生成时间：[^<\n]*/,
+      `日历最后生成时间：${formattedTime}`
+    );
+    
+    await fsp.writeFile(filePath, content);
+    console.log('Generation time updated successfully');
   } catch (error) {
     console.error('Error updating generation time:', error);
+    throw error;
   }
 }
 
@@ -283,11 +269,10 @@ async function generateAllCalendars() {
     console.log('Generating all calendars...');
     
     // 获取时间范围
-    const { startTime, endTime } = getTimeRange();
+    const now = new Date();
+    const startTime = Math.floor(now.getTime() / 1000);
+    const endTime = Math.floor(addDays(now, 7).getTime() / 1000);
 
-    console.log('Current time:', new Date().toISOString());
-    console.log('Start time:', new Date(startTime * 1000).toISOString());
-    console.log('End time:', new Date(endTime * 1000).toISOString());
     console.log('Fetching events from', startTime, 'to', endTime);
 
     // 获取所有事件
@@ -307,27 +292,26 @@ async function generateAllCalendars() {
 
     // 生成全球日历
     const calendar = ical({
-      name: 'Economic Calendar',
+      name: '全球经济日历',
       timezone: 'Asia/Shanghai'
     });
 
-    // 使用所有重要事件生成全球日历
-    importantEvents.forEach(event => {
+    // 添加所有重要事件到全球日历
+    for (const event of importantEvents) {
       const startDate = toUTCDate(event.public_date);
       const emoji = getCountryEmoji(event.country_id);
       calendar.createEvent({
         start: startDate,
         end: startDate,
-        summary: `${emoji} ${event.title}`,
-        description: formatDescription(event.actual, event.forecast, event.previous),
-        location: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous)
+        summary: event.title,
+        description: event.title,
+        location: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous),
       });
-    });
+    }
 
     // 保存全球日历
-    const globalCalendarPath = path.join(__dirname, 'public', 'economic-calendar.ics');
-    await fs.promises.writeFile(globalCalendarPath, calendar.toString());
-    console.log('Global calendar generated');
+    await fsp.writeFile(path.join(__dirname, 'public', 'economic-calendar.ics'), calendar.toString());
+    console.log('Global calendar generated successfully');
 
     // 按国家分组
     const eventsByCountry = {};
@@ -342,21 +326,14 @@ async function generateAllCalendars() {
       eventsByCountry[event.country].events.push(event);
     });
 
-    // 为每个国家生成日历
-    for (const [country, data] of Object.entries(eventsByCountry)) {
-      // 检查是否有对应的标准国家名称
-      const countryName = COUNTRY_NAMES[data.country_id];
-      if (!countryName) {
-        console.log(`Skipping ${country} (${data.country_id}): no standard name found`);
-        continue;
-      }
-
+    // 生成各个国家的日历
+    for (const countryData of Object.values(eventsByCountry)) {
       const countryCalendar = ical({
-        name: `${country} Economic Calendar`,
+        name: `${countryData.country_name}经济日历`,
         timezone: 'Asia/Shanghai'
       });
 
-      for (const event of data.events) {
+      for (const event of countryData.events) {
         const startDate = toUTCDate(event.public_date);
         const emoji = getCountryEmoji(event.country_id);
         countryCalendar.createEvent({
@@ -364,19 +341,20 @@ async function generateAllCalendars() {
           end: startDate,
           summary: event.title,
           description: event.title,
-          location: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous)
+          location: formatLocation(emoji, event.country, event.actual, event.forecast, event.previous),
         });
       }
 
-      const fileName = `economic-calendar-${countryName}.ics`;
-      const filePath = path.join(__dirname, 'public', fileName);
-      await fs.promises.writeFile(filePath, countryCalendar.toString());
-      console.log(`Calendar generated for ${country} (${countryName}): ${data.events.length} events`);
+      const normalizedCountry = getNormalizedCountry(countryData.country_name);
+      await fsp.writeFile(
+        path.join(__dirname, 'public', `economic-calendar-${normalizedCountry}.ics`),
+        countryCalendar.toString()
+      );
+      console.log(`Calendar for ${countryData.country_name} generated successfully`);
     }
 
-    // 更新首页生成时间
+    // 更新生成时间
     await updateGenerationTime();
-    
     console.log('All calendars generated successfully');
   } catch (error) {
     console.error('Error generating calendars:', error);
@@ -397,8 +375,8 @@ app.get('/api/generate', async (req, res) => {
   }
 });
 
-// Serve static files
-app.use(express.static('public'));
+// 设置静态文件目录
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 导出函数供构建脚本使用
 module.exports = {
@@ -407,14 +385,7 @@ module.exports = {
 
 // 只在直接运行时启动服务器（不是被 require 时）
 if (require.main === module) {
-  // 先生成日历
-  generateAllCalendars().then(() => {
-    // 然后启动服务器
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  }).catch(error => {
-    console.error('Error generating calendars:', error);
-    process.exit(1);
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
   });
 }

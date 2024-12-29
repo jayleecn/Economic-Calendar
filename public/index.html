@@ -1,0 +1,436 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全球经济日历订阅</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="144x144" href="/favicon/favicon-144x144.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-radius: 12px;
+            --spacing: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --radius-lg: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing);
+        }
+
+        .header {
+            text-align: center;
+            padding: calc(var(--spacing) * 2.5) var(--spacing);
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing);
+            box-shadow: var(--shadow-lg);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: var(--text-color);
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            margin: var(--spacing) auto 0;
+            color: #64748b;
+            font-size: 1.1em;
+            max-width: 600px;
+            line-height: 1.8;
+        }
+
+        .header a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .header a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        .subscription-box {
+            text-align: center;
+            margin: calc(var(--spacing) * 3) 0;
+        }
+
+        .subscription-link, .country-link {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subscription-link:hover, .country-link:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .section-title {
+            text-align: center;
+            margin: calc(var(--spacing) * 3) 0 calc(var(--spacing) * 2);
+            font-size: 2em;
+            color: var(--text-color);
+            position: relative;
+            letter-spacing: -0.5px;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background-color: var(--primary-color);
+            margin: 12px auto;
+            border-radius: 2px;
+        }
+
+        .country-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: calc(var(--spacing) * 1.5);
+            padding: var(--spacing) 0;
+        }
+
+        .country-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: calc(var(--spacing) * 1.5);
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .country-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .country-card h3 {
+            margin: 0 0 20px;
+            font-size: 1.4em;
+            color: var(--text-color);
+            letter-spacing: -0.3px;
+        }
+
+        .country-link {
+            padding: 0.75rem 1.5rem;
+            font-size: 1em;
+            width: 80%;
+        }
+
+        .subscription-instructions {
+            margin-top: calc(var(--spacing) * 2);
+            background-color: var(--card-bg);
+            padding: calc(var(--spacing) * 1.5);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .instruction-section {
+            margin-bottom: calc(var(--spacing) * 1.5);
+        }
+
+        .instruction-section h3 {
+            margin: 0 0 var(--spacing) 0;
+            color: var(--text-color);
+            font-size: 1.2em;
+        }
+
+        .instruction-section ol {
+            padding-left: calc(var(--spacing) * 1.5);
+            margin: 0;
+        }
+
+        .instruction-section li {
+            margin: 8px 0;
+            color: #475569;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        .instruction-section li:first-child {
+            margin-top: 0;
+        }
+
+        .instruction-section li:last-child {
+            margin-bottom: 0;
+        }
+
+        .footer {
+            margin-top: calc(var(--spacing) * 3);
+            padding: calc(var(--spacing) * 1.5);
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95em;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .copy-success {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #16a34a;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+        }
+
+        .subscription-link.copied .copy-success,
+        .country-link.copied .copy-success {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --spacing: 16px;
+            }
+
+            .container {
+                padding: var(--spacing);
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+                padding: 0 var(--spacing);
+            }
+
+            .country-list {
+                grid-template-columns: 1fr;
+                gap: var(--spacing);
+            }
+
+            .subscription-instructions {
+                padding: var(--spacing);
+            }
+
+            .subscription-link, .country-link {
+                padding: 0.75rem 1.5rem;
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 全球经济日历</h1>
+            <div class="description">
+                包含今天到未来 7 天的⭐️⭐️⭐️重要经济事件。
+                <br>每 5 分钟自动更新
+            </div>
+            <p>日历来源：<a href="https://wallstreetcn.com/calendar" target="_blank">华尔街见闻</a>。
+                <br>日历最后生成时间：2024-12-29 18:13</p>
+        </div>
+
+        <div class="subscription-box">
+            <a href="/economic-calendar.ics" class="subscription-link" data-calendar-url="/economic-calendar.ics">
+                一键订阅全球日历
+            </a>
+        </div>
+
+        <h2 class="section-title">🌏 按国家/地区订阅</h2>
+        <div class="country-list">
+            <div class="country-card">
+                <h3>🇺🇸 美国</h3>
+                <a href="/economic-calendar-united-states.ics" class="country-link" data-calendar-url="/economic-calendar-united-states.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇨🇳 中国</h3>
+                <a href="/economic-calendar-china.ics" class="country-link" data-calendar-url="/economic-calendar-china.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇪🇺 欧元区</h3>
+                <a href="/economic-calendar-eurozone.ics" class="country-link" data-calendar-url="/economic-calendar-eurozone.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇯🇵 日本</h3>
+                <a href="/economic-calendar-japan.ics" class="country-link" data-calendar-url="/economic-calendar-japan.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇬🇧 英国</h3>
+                <a href="/economic-calendar-united-kingdom.ics" class="country-link" data-calendar-url="/economic-calendar-united-kingdom.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇦🇺 澳大利亚</h3>
+                <a href="/economic-calendar-australia.ics" class="country-link" data-calendar-url="/economic-calendar-australia.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇩🇪 德国</h3>
+                <a href="/economic-calendar-germany.ics" class="country-link" data-calendar-url="/economic-calendar-germany.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇫🇷 法国</h3>
+                <a href="/economic-calendar-france.ics" class="country-link" data-calendar-url="/economic-calendar-france.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇨🇭 瑞士</h3>
+                <a href="/economic-calendar-switzerland.ics" class="country-link" data-calendar-url="/economic-calendar-switzerland.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇨🇦 加拿大</h3>
+                <a href="/economic-calendar-canada.ics" class="country-link" data-calendar-url="/economic-calendar-canada.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇮🇹 意大利</h3>
+                <a href="/economic-calendar-italy.ics" class="country-link" data-calendar-url="/economic-calendar-italy.ics">
+                    订阅日历
+                </a>
+            </div>
+            <div class="country-card">
+                <h3>🇳🇿 新西兰</h3>
+                <a href="/economic-calendar-new-zealand.ics" class="country-link" data-calendar-url="/economic-calendar-new-zealand.ics">
+                    订阅日历
+                </a>
+            </div>
+        </div>
+        <div class="subscription-instructions">
+            <h2>📱 订阅教程</h2>
+            <div class="instruction-section">
+                <h3>Apple 日历</h3>
+                <ol>
+                    <li>在 iPhone、iPad 或 Mac 上打开"日历"</li>
+                    <li>点击"文件" > "新建日历订阅"（Mac）或点击"日历" > "添加日历" > "添加订阅的日历"（iOS）</li>
+                    <li>输入上方的日历链接</li>
+                    <li>在"自动刷新"选项中，建议选择"每15分钟"以获取最新数据</li>
+                    <li>其他选项根据需要调整（如时区、提醒等）</li>
+                    <li>点击"添加"或"好"完成订阅</li>
+                </ol>
+            </div>
+
+            <div class="instruction-section">
+                <h3>Google 日历</h3>
+                <ol>
+                    <li>打开 <a href="https://calendar.google.com" target="_blank">Google 日历</a></li>
+                    <li>在左侧找到"其他日历"，点击旁边的加号（+）</li>
+                    <li>选择"通过 URL 添加"</li>
+                    <li>输入上方的日历链接</li>
+                    <li>点击"添加日历"完成订阅</li>
+                </ol>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        function copyToClipboard(text, button, event) {
+            // 阻止链接的默认行为
+            event.preventDefault();
+            
+            // 构建完整的 URL
+            const fullUrl = window.location.origin + text;
+            
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制订阅链接 ✓';
+                button.style.backgroundColor = '#22c55e';  // 绿色
+                
+                // 2秒后恢复原始状态
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                button.textContent = '复制失败，请重试';
+                button.style.backgroundColor = '#ef4444';  // 红色
+                
+                // 2秒后恢复原始状态
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '';
+                }, 2000);
+            });
+        }
+
+        // 为所有订阅按钮添加点击事件
+        document.addEventListener('DOMContentLoaded', () => {
+            const subscribeButtons = document.querySelectorAll('.subscription-link, .country-link');
+            subscribeButtons.forEach(button => {
+                const calendarUrl = button.getAttribute('data-calendar-url');
+                button.addEventListener('click', (event) => copyToClipboard(calendarUrl, button, event));
+            });
+        });
+    </script>
+</body>
+</html>
