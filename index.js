@@ -85,14 +85,29 @@ const getCountryEmoji = (countryCode) => {
 };
 
 // Convert timestamp to UTC Date object (considering Beijing timezone)
-const toUTCDate = (timestamp) => {
-  // 创建北京时间的 Date 对象
-  const date = new Date(timestamp * 1000);
-  // 转换为北京时间（UTC+8）
-  const beijingOffset = 8 * 60 * 60 * 1000; // 8小时的毫秒数
-  const utcDate = new Date(date.getTime() + beijingOffset);
-  return utcDate;
-};
+function toUTCDate(timestamp) {
+  // Convert timestamp to milliseconds if it's in seconds
+  const timestampMs = timestamp * 1000;
+  // Create a date object in the local timezone
+  const date = new Date(timestampMs);
+  // Return the date object
+  return date;
+}
+
+// 获取时间范围（考虑北京时区）
+function getTimeRange(days = 7) {
+  // 获取当前北京时间
+  const now = new Date();
+  // 设置为当天的开始（00:00:00）
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  // 设置为未来第 N 天的结束（23:59:59.999）
+  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + days, 23, 59, 59, 999);
+  
+  return {
+    startTime: Math.floor(start.getTime() / 1000),
+    endTime: Math.floor(end.getTime() / 1000)
+  };
+}
 
 // Get country flag emoji
 const getFlag = (countryCode) => {
@@ -141,9 +156,7 @@ async function generateCalendarContent() {
     console.log('Generating calendar content...');
     
     // 获取时间范围
-    const now = new Date();
-    const startTime = startOfDay(now).getTime() / 1000;
-    const endTime = endOfDay(addDays(now, 7)).getTime() / 1000;
+    const { startTime, endTime } = getTimeRange();
 
     console.log('Current time:', new Date().toISOString());
     console.log('Start time:', new Date(startTime * 1000).toISOString());
@@ -196,9 +209,7 @@ async function generateCountryCalendar(countryId, countryName) {
     console.log(`Generating calendar for ${countryId} (${countryName})...`);
     
     // 获取时间范围
-    const now = new Date();
-    const startTime = startOfDay(now).getTime() / 1000;
-    const endTime = endOfDay(addDays(now, 7)).getTime() / 1000;
+    const { startTime, endTime } = getTimeRange();
 
     console.log('Current time:', new Date().toISOString());
     console.log('Start time:', new Date(startTime * 1000).toISOString());
@@ -272,9 +283,7 @@ async function generateAllCalendars() {
     console.log('Generating all calendars...');
     
     // 获取时间范围
-    const now = new Date();
-    const startTime = startOfDay(now).getTime() / 1000;
-    const endTime = endOfDay(addDays(now, 7)).getTime() / 1000;
+    const { startTime, endTime } = getTimeRange();
 
     console.log('Current time:', new Date().toISOString());
     console.log('Start time:', new Date(startTime * 1000).toISOString());
