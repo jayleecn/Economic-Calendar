@@ -141,9 +141,13 @@ async function generateCalendarContent() {
     console.log('Generating calendar content...');
     
     // 获取时间范围
-    const startTime = startOfDay(new Date()).getTime() / 1000;
-    const endTime = endOfDay(addDays(new Date(), 7)).getTime() / 1000;  
+    const now = new Date();
+    const startTime = startOfDay(now).getTime() / 1000;
+    const endTime = endOfDay(addDays(now, 7)).getTime() / 1000;
 
+    console.log('Current time:', new Date().toISOString());
+    console.log('Start time:', new Date(startTime * 1000).toISOString());
+    console.log('End time:', new Date(endTime * 1000).toISOString());
     console.log('Fetching events from', startTime, 'to', endTime);
 
     // Fetch events
@@ -192,9 +196,13 @@ async function generateCountryCalendar(countryId, countryName) {
     console.log(`Generating calendar for ${countryId} (${countryName})...`);
     
     // 获取时间范围
-    const startTime = startOfDay(new Date()).getTime() / 1000;
-    const endTime = endOfDay(addDays(new Date(), 7)).getTime() / 1000;  
+    const now = new Date();
+    const startTime = startOfDay(now).getTime() / 1000;
+    const endTime = endOfDay(addDays(now, 7)).getTime() / 1000;
 
+    console.log('Current time:', new Date().toISOString());
+    console.log('Start time:', new Date(startTime * 1000).toISOString());
+    console.log('End time:', new Date(endTime * 1000).toISOString());
     console.log('Fetching events from', startTime, 'to', endTime);
 
     // Fetch events
@@ -264,9 +272,13 @@ async function generateAllCalendars() {
     console.log('Generating all calendars...');
     
     // 获取时间范围
-    const startTime = startOfDay(new Date()).getTime() / 1000;
-    const endTime = endOfDay(addDays(new Date(), 7)).getTime() / 1000;  
+    const now = new Date();
+    const startTime = startOfDay(now).getTime() / 1000;
+    const endTime = endOfDay(addDays(now, 7)).getTime() / 1000;
 
+    console.log('Current time:', new Date().toISOString());
+    console.log('Start time:', new Date(startTime * 1000).toISOString());
+    console.log('End time:', new Date(endTime * 1000).toISOString());
     console.log('Fetching events from', startTime, 'to', endTime);
 
     // 获取所有事件
