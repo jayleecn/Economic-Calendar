@@ -88,23 +88,22 @@
 
         .subscription-link, .country-link {
             display: inline-block;
-            padding: 16px 44px;
+            padding: 0.75rem 1.5rem;
             background-color: var(--primary-color);
             color: white;
             text-decoration: none;
-            border-radius: var(--border-radius);
-            font-weight: 600;
-            font-size: 1.2em;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow-md);
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
             position: relative;
             overflow: hidden;
         }
 
         .subscription-link:hover, .country-link:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
         }
 
         .section-title {
@@ -155,7 +154,7 @@
         }
 
         .country-link {
-            padding: 12px 24px;
+            padding: 0.75rem 1.5rem;
             font-size: 1em;
             width: 80%;
         }
@@ -265,7 +264,7 @@
             }
 
             .subscription-link, .country-link {
-                padding: 14px 28px;
+                padding: 0.75rem 1.5rem;
                 font-size: 1.1em;
             }
         }
@@ -275,15 +274,17 @@
     <div class="container">
         <div class="header">
             <h1>📅 全球经济日历</h1>
-            <p>日历来源：<a href="https://wallstreetcn.com/calendar" target="_blank">华尔街见闻</a>，包含今天到未来 30 天的⭐️⭐️⭐️重要经济事件。
-                <br>每 5 分钟自动更新，支持 iCloud、Google Calendar 等。
-                <br>日历最后生成时间：2024-12-22 20:01。</p>
+            <div class="description">
+                包含今天到未来 7 天的⭐️⭐️⭐️重要经济事件。
+                <br>每 5 分钟自动更新
+            </div>
+            <p>日历来源：<a href="https://wallstreetcn.com/calendar" target="_blank">华尔街见闻</a>。
+                <br>日历最后生成时间：2024-12-29 17:34。</p>
         </div>
 
         <div class="subscription-box">
-            <a href="/economic-calendar.ics" class="subscription-link" onclick="handleSubscribe(event, this)">
+            <a href="/economic-calendar.ics" class="subscription-link" data-calendar-url="/economic-calendar.ics">
                 一键订阅全球日历
-                <div class="copy-success">已复制订阅链接 ✓</div>
             </a>
         </div>
 
@@ -291,86 +292,74 @@
         <div class="country-list">
             <div class="country-card">
                 <h3>🇺🇸 美国</h3>
-                <a href="/economic-calendar-united-states.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-united-states.ics" class="country-link" data-calendar-url="/economic-calendar-united-states.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇨🇳 中国</h3>
-                <a href="/economic-calendar-china.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-china.ics" class="country-link" data-calendar-url="/economic-calendar-china.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇪🇺 欧元区</h3>
-                <a href="/economic-calendar-eurozone.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-eurozone.ics" class="country-link" data-calendar-url="/economic-calendar-eurozone.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇯🇵 日本</h3>
-                <a href="/economic-calendar-japan.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-japan.ics" class="country-link" data-calendar-url="/economic-calendar-japan.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇬🇧 英国</h3>
-                <a href="/economic-calendar-united-kingdom.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-united-kingdom.ics" class="country-link" data-calendar-url="/economic-calendar-united-kingdom.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇦🇺 澳大利亚</h3>
-                <a href="/economic-calendar-australia.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-australia.ics" class="country-link" data-calendar-url="/economic-calendar-australia.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇩🇪 德国</h3>
-                <a href="/economic-calendar-germany.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-germany.ics" class="country-link" data-calendar-url="/economic-calendar-germany.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇫🇷 法国</h3>
-                <a href="/economic-calendar-france.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-france.ics" class="country-link" data-calendar-url="/economic-calendar-france.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇨🇭 瑞士</h3>
-                <a href="/economic-calendar-switzerland.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-switzerland.ics" class="country-link" data-calendar-url="/economic-calendar-switzerland.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇨🇦 加拿大</h3>
-                <a href="/economic-calendar-canada.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-canada.ics" class="country-link" data-calendar-url="/economic-calendar-canada.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇮🇹 意大利</h3>
-                <a href="/economic-calendar-italy.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-italy.ics" class="country-link" data-calendar-url="/economic-calendar-italy.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
             <div class="country-card">
                 <h3>🇳🇿 新西兰</h3>
-                <a href="/economic-calendar-new-zealand.ics" class="country-link" onclick="handleSubscribe(event, this)">
+                <a href="/economic-calendar-new-zealand.ics" class="country-link" data-calendar-url="/economic-calendar-new-zealand.ics">
                     订阅日历
-                    <div class="copy-success">已复制订阅链接 ✓</div>
                 </a>
             </div>
         </div>
@@ -403,27 +392,44 @@
     </div>
 
     <script>
-        function handleSubscribe(event, element) {
+        function copyToClipboard(text, button, event) {
+            // 阻止链接的默认行为
             event.preventDefault();
             
-            // 获取链接地址
-            const calendarUrl = element.href;
+            // 构建完整的 URL
+            const fullUrl = window.location.origin + text;
             
-            // 复制链接到剪贴板
-            navigator.clipboard.writeText(calendarUrl).then(() => {
-                // 更新按钮文本
-                const originalText = element.textContent;
-                element.textContent = '已复制订阅链接';
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制订阅链接 ✓';
+                button.style.backgroundColor = '#22c55e';  // 绿色
                 
-                // 3秒后恢复原始文本
+                // 2秒后恢复原始状态
                 setTimeout(() => {
-                    element.textContent = originalText;
-                }, 3000);
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '';
+                }, 2000);
             }).catch(err => {
-                console.error('Failed to copy:', err);
-                alert('复制链接失败，请手动复制');
+                console.error('Failed to copy text: ', err);
+                button.textContent = '复制失败，请重试';
+                button.style.backgroundColor = '#ef4444';  // 红色
+                
+                // 2秒后恢复原始状态
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '';
+                }, 2000);
             });
         }
+
+        // 为所有订阅按钮添加点击事件
+        document.addEventListener('DOMContentLoaded', () => {
+            const subscribeButtons = document.querySelectorAll('.subscription-link, .country-link');
+            subscribeButtons.forEach(button => {
+                const calendarUrl = button.getAttribute('data-calendar-url');
+                button.addEventListener('click', (event) => copyToClipboard(calendarUrl, button, event));
+            });
+        });
     </script>
 </body>
 </html>

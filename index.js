@@ -142,7 +142,7 @@ async function generateCalendarContent() {
     
     // 获取时间范围
     const startTime = startOfDay(new Date()).getTime() / 1000;
-    const endTime = endOfDay(addDays(new Date(), 30)).getTime() / 1000;  // 改为30天
+    const endTime = endOfDay(addDays(new Date(), 7)).getTime() / 1000;  
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
@@ -193,7 +193,7 @@ async function generateCountryCalendar(countryId, countryName) {
     
     // 获取时间范围
     const startTime = startOfDay(new Date()).getTime() / 1000;
-    const endTime = endOfDay(addDays(new Date(), 30)).getTime() / 1000;  // 改为30天
+    const endTime = endOfDay(addDays(new Date(), 7)).getTime() / 1000;  
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
@@ -265,7 +265,7 @@ async function generateAllCalendars() {
     
     // 获取时间范围
     const startTime = startOfDay(new Date()).getTime() / 1000;
-    const endTime = endOfDay(addDays(new Date(), 30)).getTime() / 1000;  // 改为30天
+    const endTime = endOfDay(addDays(new Date(), 7)).getTime() / 1000;  
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
