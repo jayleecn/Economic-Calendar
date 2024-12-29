@@ -284,19 +284,6 @@ async function generateAllCalendars() {
     const importantEvents = items.filter(event => event.importance === 3);
     console.log(`Filtered ${importantEvents.length} important events (importance = 3)`);
 
-    // 按国家分组
-    const eventsByCountry = {};
-    importantEvents.forEach(event => {
-      if (!eventsByCountry[event.country]) {
-        eventsByCountry[event.country] = {
-          events: [],
-          country_id: event.country_id,
-          country_name: event.country
-        };
-      }
-      eventsByCountry[event.country].events.push(event);
-    });
-
     // 生成全球日历
     const calendar = ical({
       name: 'Economic Calendar',
@@ -320,6 +307,19 @@ async function generateAllCalendars() {
     const globalCalendarPath = path.join(__dirname, 'public', 'economic-calendar.ics');
     await fs.promises.writeFile(globalCalendarPath, calendar.toString());
     console.log('Global calendar generated');
+
+    // 按国家分组
+    const eventsByCountry = {};
+    importantEvents.forEach(event => {
+      if (!eventsByCountry[event.country]) {
+        eventsByCountry[event.country] = {
+          events: [],
+          country_id: event.country_id,
+          country_name: event.country
+        };
+      }
+      eventsByCountry[event.country].events.push(event);
+    });
 
     // 为每个国家生成日历
     for (const [country, data] of Object.entries(eventsByCountry)) {
