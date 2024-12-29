@@ -140,18 +140,17 @@ async function generateCalendarContent() {
     
     console.log('Generating calendar content...');
     
-    // Calculate time range (Beijing time)
-    const now = new Date();
-    const startTime = subDays(startOfDay(now), 1); // 从昨天开始
-    const endTime = endOfDay(addDays(now, 6)); // 改为 6 天后（总共 7 天）
+    // 获取时间范围
+    const startTime = startOfDay(new Date()).getTime() / 1000;
+    const endTime = endOfDay(addDays(new Date(), 30)).getTime() / 1000;  // 改为30天
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
     // Fetch events
     const response = await axios.get('https://api-one-wscn.awtmt.com/apiv1/finance/macrodatas', {
       params: {
-        start: Math.floor(startTime.getTime() / 1000),
-        end: Math.floor(endTime.getTime() / 1000),
+        start: startTime,
+        end: endTime,
       },
     });
 
@@ -192,18 +191,17 @@ async function generateCountryCalendar(countryId, countryName) {
   try {
     console.log(`Generating calendar for ${countryId} (${countryName})...`);
     
-    // Calculate time range (Beijing time)
-    const now = new Date();
-    const startTime = subDays(startOfDay(now), 1); // 从昨天开始
-    const endTime = endOfDay(addDays(now, 6)); // 改为 6 天后（总共 7 天）
+    // 获取时间范围
+    const startTime = startOfDay(new Date()).getTime() / 1000;
+    const endTime = endOfDay(addDays(new Date(), 30)).getTime() / 1000;  // 改为30天
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
     // Fetch events
     const response = await axios.get('https://api-one-wscn.awtmt.com/apiv1/finance/macrodatas', {
       params: {
-        start: Math.floor(startTime.getTime() / 1000),
-        end: Math.floor(endTime.getTime() / 1000),
+        start: startTime,
+        end: endTime,
         country: countryId,
       },
     });
@@ -265,18 +263,17 @@ async function generateAllCalendars() {
   try {
     console.log('Generating all calendars...');
     
-    // Calculate time range (Beijing time)
-    const now = new Date();
-    const startTime = subDays(startOfDay(now), 0); // 从今天开始
-    const endTime = endOfDay(addDays(now, 7)); // 7 天
+    // 获取时间范围
+    const startTime = startOfDay(new Date()).getTime() / 1000;
+    const endTime = endOfDay(addDays(new Date(), 30)).getTime() / 1000;  // 改为30天
 
     console.log('Fetching events from', startTime, 'to', endTime);
 
     // 获取所有事件
     const response = await axios.get('https://api-one-wscn.awtmt.com/apiv1/finance/macrodatas', {
       params: {
-        start: Math.floor(startTime.getTime() / 1000),
-        end: Math.floor(endTime.getTime() / 1000),
+        start: startTime,
+        end: endTime,
       },
     });
 
