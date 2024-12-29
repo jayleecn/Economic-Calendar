@@ -2,17 +2,20 @@ name: Update Economic Calendar
 
 on:
   schedule:
-    - cron: '* * * * *'  # 每分钟运行
+    - cron: '*/5 * * * *'  # 每5分钟运行一次
   workflow_dispatch:        # 支持手动触发
 
 jobs:
   update-calendar:
     runs-on: ubuntu-latest
+    permissions:           # 明确指定需要的权限
+      contents: write     # 需要写入权限来提交更改
     
     steps:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_TOKEN }}
+          fetch-depth: 1   # 优化克隆深度
       
       - name: Setup Git
         run: |
@@ -23,6 +26,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'npm'    # 启用 npm 缓存
           
       - name: Install dependencies
         run: npm install
