@@ -392,29 +392,26 @@
     </div>
 
     <script>
-        async function handleSubscribe(event, element) {
+        function handleSubscribe(event, element) {
             event.preventDefault();
             
-            // 获取完整的订阅链接
-            const url = window.location.origin + element.getAttribute('href');
+            // 获取链接地址
+            const calendarUrl = element.href;
             
-            try {
-                // 复制链接到剪贴板
-                await navigator.clipboard.writeText(url);
+            // 复制链接到剪贴板
+            navigator.clipboard.writeText(calendarUrl).then(() => {
+                // 更新按钮文本
+                const originalText = element.textContent;
+                element.textContent = '已复制订阅链接';
                 
-                // 显示复制成功提示
-                element.classList.add('copied');
-                
-                // 延迟后再跳转，让用户能看到复制成功的提示
+                // 3秒后恢复原始文本
                 setTimeout(() => {
-                    // 移除复制成功提示
-                    element.classList.remove('copied');
-                    // 跳转到日历链接
-                    window.location.href = url;
-                }, 800); // 等待 800ms
-            } catch (error) {
-                console.error('复制失败:', error);
-            }
+                    element.textContent = originalText;
+                }, 3000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('复制链接失败，请手动复制');
+            });
         }
     </script>
 </body>
