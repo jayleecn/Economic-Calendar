@@ -1,0 +1,21 @@
+{
+    "name": "全球经济日历",
+    "short_name": "经济日历",
+    "description": "提供未来30天的重要经济事件订阅服务",
+    "icons": [
+        {
+            "src": "/favicon/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/favicon/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#2563eb",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/"
+}

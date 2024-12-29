@@ -27,7 +27,7 @@
 
 ## 如何订阅
 
-### iCloud 日历
+### Apple 日历
 1. 在 iPhone 上打开"设置"
 2. 前往"日历" > "账户"
 3. 选择"添加账户" > "添加订阅的日历"
@@ -35,7 +35,7 @@
    - 全球日历：`https://your-domain.com/economic-calendar.ics`
    - 单个国家（以美国为例）：`https://your-domain.com/economic-calendar-united-states.ics`
 
-### Google Calendar
+### Google 日历
 1. 打开 Google Calendar
 2. 点击左侧"其他日历"旁的 "+" 按钮
 3. 选择"通过 URL 订阅"
