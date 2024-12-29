@@ -398,7 +398,14 @@ module.exports = {
 
 // 只在直接运行时启动服务器（不是被 require 时）
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  // 先生成日历
+  generateAllCalendars().then(() => {
+    // 然后启动服务器
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  }).catch(error => {
+    console.error('Error generating calendars:', error);
+    process.exit(1);
   });
 }
