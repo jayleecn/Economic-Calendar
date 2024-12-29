@@ -23,7 +23,7 @@
             --card-bg: #ffffff;
             --text-color: #1e293b;
             --border-radius: 12px;
-            --spacing: 20px;
+            --spacing: 16px;  /* 减小基础间距 */
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
@@ -47,7 +47,7 @@
 
         .header {
             text-align: center;
-            padding: calc(var(--spacing) * 2.5) var(--spacing);
+            padding: var(--spacing) var(--spacing);  /* 减少header的内边距 */
             background-color: var(--card-bg);
             border-radius: var(--border-radius);
             margin-bottom: var(--spacing);
@@ -62,11 +62,11 @@
         }
 
         .header p {
-            margin: var(--spacing) auto 0;
+            margin: calc(var(--spacing) * 0.5) auto 0;  /* 减少段落间距 */
             color: #64748b;
             font-size: 1.1em;
             max-width: 600px;
-            line-height: 1.8;
+            line-height: 1.6;  /* 减小行高 */
         }
 
         .header a {
@@ -83,7 +83,7 @@
 
         .subscription-box {
             text-align: center;
-            margin: calc(var(--spacing) * 3) 0;
+            margin: calc(var(--spacing) * 1.5) 0;  /* 减少订阅框的上下边距 */
         }
 
         .subscription-link, .country-link {
@@ -108,7 +108,7 @@
 
         .section-title {
             text-align: center;
-            margin: calc(var(--spacing) * 3) 0 calc(var(--spacing) * 2);
+            margin: calc(var(--spacing) * 1.5) 0 var(--spacing);  /* 减少标题的上下边距 */
             font-size: 2em;
             color: var(--text-color);
             position: relative;
@@ -128,14 +128,14 @@
         .country-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: calc(var(--spacing) * 1.5);
-            padding: var(--spacing) 0;
+            gap: var(--spacing);  /* 减少卡片之间的间距 */
+            padding: calc(var(--spacing) * 0.5) 0;  /* 减少列表的内边距 */
         }
 
         .country-card {
             background-color: var(--card-bg);
             border-radius: var(--border-radius);
-            padding: calc(var(--spacing) * 1.5);
+            padding: var(--spacing);  /* 减少卡片的内边距 */
             text-align: center;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--shadow-sm);
@@ -147,7 +147,7 @@
         }
 
         .country-card h3 {
-            margin: 0 0 20px;
+            margin: 0 0 calc(var(--spacing) * 0.75);  /* 减少标题下边距 */
             font-size: 1.4em;
             color: var(--text-color);
             letter-spacing: -0.3px;
@@ -160,15 +160,15 @@
         }
 
         .subscription-instructions {
-            margin-top: calc(var(--spacing) * 2);
+            margin-top: var(--spacing);  /* 减少订阅说明的上边距 */
             background-color: var(--card-bg);
-            padding: calc(var(--spacing) * 1.5);
+            padding: var(--spacing);  /* 减少内边距 */
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
         }
 
         .instruction-section {
-            margin-bottom: calc(var(--spacing) * 1.5);
+            margin-bottom: var(--spacing);  /* 减少说明部分的下边距 */
         }
 
         .instruction-section h3 {
