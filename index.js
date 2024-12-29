@@ -63,21 +63,29 @@ const updateCountryCodes = async () => {
 };
 
 // 获取标准化的国家代码
-const getNormalizedCountry = (country) => {
-  // 先尝试直接匹配国家代码
-  if (COUNTRY_CODES[country]) {
-    return country;
-  }
-  
-  // 再尝试匹配中文名称
-  for (const [code, [name]] of Object.entries(COUNTRY_CODES)) {
-    if (country === name) {
-      return code;
-    }
-  }
-  
-  return null;
-};
+function getNormalizedCountry(country) {
+  const countryMap = {
+    '中国': 'china',
+    '美国': 'united-states',
+    '欧元区': 'eurozone',
+    '日本': 'japan',
+    '英国': 'united-kingdom',
+    '澳大利亚': 'australia',
+    '加拿大': 'canada',
+    '瑞士': 'switzerland',
+    '德国': 'germany',
+    '法国': 'france',
+    '意大利': 'italy',
+    '新西兰': 'new-zealand',
+    '西班牙': 'spain',
+    '韩国': 'south-korea',
+    '香港': 'hong-kong',
+    '新加坡': 'singapore',
+    '挪威': 'norway',
+    '瑞典': 'sweden'
+  };
+  return countryMap[country] || country.toLowerCase().replace(/\s+/g, '-');
+}
 
 // 获取国家的emoji
 const getCountryEmoji = (countryCode) => {
