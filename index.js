@@ -94,8 +94,7 @@ const getCountryEmoji = (countryCode) => {
 
 // Convert timestamp to UTC Date object (considering Beijing timezone)
 const toUTCDate = (timestamp) => {
-  const date = new Date(timestamp * 1000);
-  return date;
+  return new Date(timestamp * 1000);
 };
 
 // Get country flag emoji
@@ -258,13 +257,26 @@ async function updateGenerationTime() {
     const filePath = path.join(__dirname, 'public', 'index.html');
     let content = await fsp.readFile(filePath, 'utf8');
     
-    content = content.replace(
-      /日历最后生成时间：[^<\n]*/,
-      `日历最后生成时间：${formattedTime}`
-    );
+    // 使用更简单的替换方式
+    const searchString = '日历最后生成时间：';
+    const startIndex = content.indexOf(searchString);
+    if (startIndex === -1) {
+      console.error('Could not find generation time string');
+      return;
+    }
     
-    await fsp.writeFile(filePath, content);
-    console.log('Generation time updated successfully');
+    const endIndex = content.indexOf('</p>', startIndex);
+    if (endIndex === -1) {
+      console.error('Could not find closing p tag');
+      return;
+    }
+    
+    const newContent = content.substring(0, startIndex + searchString.length) +
+                      formattedTime +
+                      content.substring(endIndex);
+    
+    await fsp.writeFile(filePath, newContent);
+    console.log('Generation time updated successfully:', formattedTime);
   } catch (error) {
     console.error('Error updating generation time:', error);
     throw error;
