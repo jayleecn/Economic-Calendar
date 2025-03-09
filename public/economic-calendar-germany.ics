@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//sebbo.net//ical-generator//EN
+NAME:德国经济日历
+X-WR-CALNAME:德国经济日历
+TIMEZONE-ID:Asia/Shanghai
+X-WR-TIMEZONE:Asia/Shanghai
+BEGIN:VEVENT
+UID:aa489b55-a51a-4141-96b6-0c75720d1c6d
+SEQUENCE:0
+DTSTAMP:20250309T083351
+DTSTART:20250313T040200
+DTEND:20250313T040200
+SUMMARY:德国联邦议院就一项大规模财政扩张计划的宪法修
+  正案草案进行一次审议
+LOCATION:🇩🇪德国
+DESCRIPTION:德国联邦议院就一项大规模财政扩张计划的宪
+ 法修 正案草案进行一次审议
+END:VEVENT
+END:VCALENDAR
