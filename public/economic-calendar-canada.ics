@@ -6,13 +6,13 @@ X-WR-CALNAME:加拿大经济日历
 TIMEZONE-ID:Asia/Shanghai
 X-WR-TIMEZONE:Asia/Shanghai
 BEGIN:VEVENT
-UID:82890936-0688-45c2-84db-2f83f621e70a
+UID:e1833928-2f85-422b-b218-0d59a710dba0
 SEQUENCE:0
-DTSTAMP:20250917T133610
-DTSTART:20250917T134500
-DTEND:20250917T134500
-SUMMARY:央行政策利率
-LOCATION:🇨🇦加拿大 | 预期: 2.5 | 前值: 2.75
-DESCRIPTION:央行政策利率
+DTSTAMP:20251023T035109
+DTSTART:20251029T134500
+DTEND:20251029T134500
+SUMMARY:加拿大央行公布利率决议和货币政策报告
+LOCATION:🇨🇦加拿大
+DESCRIPTION:加拿大央行公布利率决议和货币政策报告
 END:VEVENT
 END:VCALENDAR
