@@ -6,13 +6,15 @@ X-WR-CALNAME:瑞士经济日历
 TIMEZONE-ID:Asia/Shanghai
 X-WR-TIMEZONE:Asia/Shanghai
 BEGIN:VEVENT
-UID:fc9ac0c2-300e-475d-9c6d-bb7bfac06082
+UID:0c0f8cb4-90a1-4ed6-98f4-f30f2b907f56
 SEQUENCE:0
-DTSTAMP:20250320T075850
-DTSTART:20250320T083000
-DTEND:20250320T083000
-SUMMARY:瑞士央行公布利率决议
+DTSTAMP:20260116T032028
+DTSTART:20260121T073000
+DTEND:20260121T073000
+SUMMARY:欧洲央行行长拉加德和贝莱德CEO出席世界经济论坛
+ 讨论会
 LOCATION:🇨🇭瑞士
-DESCRIPTION:瑞士央行公布利率决议
+DESCRIPTION:欧洲央行行长拉加德和贝莱德CEO出席世界经济
+ 论坛讨论会
 END:VEVENT
 END:VCALENDAR
